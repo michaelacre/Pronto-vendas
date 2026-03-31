@@ -254,11 +254,17 @@
       const filtered = dbCortes.filter(d => {
         const dataRow = d.data ? d.data.split('T')[0] : "";
         
-        // CORREÇÃO AQUI: Ajuste para reconhecer 'DPA' como 'DOM PORQUITO'
+        // LÓGICA BLINDADA: Busca por parte do nome para evitar erros de digitação
         let empresaMatch = true;
         if (fE) {
-          const termoBusca = (fE === 'DPA') ? 'DOM PORQUITO' : fE;
-          empresaMatch = (d.empresa && d.empresa.toUpperCase() === termoBusca);
+          const nomeNaPlanilha = (d.empresa || "").toUpperCase();
+          if (fE === 'DPA') {
+            // Se selecionar DPA, ele aceita se encontrar "DOM" ou "PORQUITO" ou "DPA"
+            empresaMatch = nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
+          } else {
+            // Para as outras, verifica se o nome selecionado está contido no nome da planilha
+            empresaMatch = nomeNaPlanilha.includes(fE.toUpperCase());
+          }
         }
 
         return (!fV || d.vendedor == fV) &&
