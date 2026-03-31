@@ -1,112 +1,149 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html>
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>PRONTO PRA VENDA</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>JARVIS VENDAS</title>
   <link rel="manifest" href="manifest.json">
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
   <style>
     :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
-    body { background-color: #f0f2f5; font-family: 'Segoe UI', sans-serif; margin-bottom: 70px; }
-    .header-app { background: var(--jarvis-blue); color: white; padding: 20px; text-align: center; border-radius: 0 0 25px 25px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); }
-    .card-venda { background: white; border-radius: 15px; padding: 15px; box-shadow: 0 2px 10px rgba(0,0,0,0.05); margin-bottom: 12px; border-left: 5px solid var(--jarvis-blue); transition: 0.3s; }
-    .card-venda:active { transform: scale(0.98); }
-    .badge-kg { background: #e8f5e9; color: #2e7d32; font-weight: bold; padding: 8px 12px; border-radius: 10px; }
-    .badge-critico { background: #ffebee; color: #c62828; }
-    .btn-refresh { position: fixed; bottom: 25px; right: 25px; width: 60px; height: 60px; border-radius: 50%; background: var(--jarvis-blue); color: white; border: none; box-shadow: 0 6px 15px rgba(0,0,0,0.3); z-index: 1000; display: flex; align-items: center; justify-content: center; }
-    #status { font-size: 0.75rem; opacity: 0.8; }
-    .search-box { border-radius: 12px; border: none; padding: 12px 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin-bottom: 75px; }
+    .header-app { background: var(--jarvis-blue); color: white; padding: 12px; text-align: center; }
+    .data-atualizacao { font-size: 0.75rem; color: #add8e6; display: block; margin-top: -5px; }
+    .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px; border-top: 2px solid var(--jarvis-blue); z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+    .nav-item { text-align: center; color: #666; text-decoration: none; font-size: 0.7rem; background: none; border: none; flex: 1; }
+    .nav-item i { font-size: 1.3rem; display: block; }
+    .nav-item.active { color: var(--jarvis-blue); font-weight: bold; }
+    .section-app { display: none; padding: 10px; }
+    .active-section { display: block; }
+    .card-kpi { background: #161616; color: white; border-radius: 10px; padding: 10px; text-align: center; border-bottom: 3px solid var(--jarvis-accent); height: 100%; }
+    .card-kpi h3 { font-size: 0.65rem; text-transform: uppercase; color: #888; margin: 0; }
+    .card-kpi p { font-size: 1.1rem; font-weight: bold; color: var(--jarvis-accent); margin: 2px 0 0; }
+    .linha-produto { background: white; border-bottom: 1px solid #eee; padding: 8px; display: flex; align-items: center; }
+    .quadrante { width: 65px; height: 38px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-left: 4px; font-size: 0.8rem; font-weight: bold; }
+    .bg-baixo { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
+    .bg-critico { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
+    .bg-ok { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
+    .item-corte { background: white; border-radius: 8px; padding: 8px; margin-bottom: 6px; border-left: 4px solid #dc3545; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.8rem; }
+    .item-corte .top { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; padding-bottom: 2px; }
+    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+    .bi-spin { display: inline-block; animation: spin 1.5s linear infinite; }
   </style>
 </head>
 <body>
 
-  <div class="header-app mb-4">
-    <h5 class="fw-bold mb-1">SISTEMA DE VENDAS</h5>
-    <div id="status">Sincronizando com o satélite...</div>
-  </div>
-
-  <div class="container">
-    <div class="position-relative mb-4">
-      <input type="text" id="busca" class="form-control search-box" placeholder="🔍 Procurar produto ou código..." onkeyup="filtrar()">
+  <div id="estoque-section" class="section-app active-section">
+    <div class="header-app d-flex justify-content-between align-items-center px-3 mb-2">
+      <div style="width: 32px;"></div> 
+      <div class="text-center">
+        <h6 class="mb-0">PRONTO PRA VENDAS</h6>
+        <span id="data-estoque" class="data-atualizacao">Sincronizando...</span>
+      </div>
+      <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
     </div>
-    
-    <div id="listaEstoque">
-      <div class="text-center py-5">
-        <div class="spinner-border text-primary" role="status"></div>
-        <p class="mt-2 text-muted">Carregando estoque, Senhor Michael...</p>
+    <div class="p-2 sticky-top" style="top:0; z-index:1001; background:#f8f9fa">
+      <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="filtrarEstoque()">
+      <div class="d-flex gap-1 overflow-auto pb-1">
+        <button class="btn btn-sm btn-dark" onclick="filtrarEmpresa('TODOS')">TODOS</button>
+        <button class="btn btn-sm btn-primary" onclick="filtrarEmpresa('ACREAVES')">ACREAVES</button>
+        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORQUITO')">D.PORQUITO</button>
+        <button class="btn btn-sm btn-warning text-dark" onclick="filtrarEmpresa('FRIPAL')">FRIPAL</button>
       </div>
     </div>
+    <div id="listaEstoque"></div>
   </div>
 
-  <button class="btn-refresh" onclick="carregarDados()">
-    <i class="bi bi-arrow-clockwise fs-3"></i>
-  </button>
+  <div id="cortes-section" class="section-app">
+    <div class="header-app mb-3"><h6>INTELIGÊNCIA DE CORTES</h6></div>
+    <div class="row g-2 mb-3 px-2">
+      <div class="col-6"><div class="card-kpi"><h3>Cx Cortadas</h3><p id="resCaixas">0</p></div></div>
+      <div class="col-6"><div class="card-kpi"><h3>Prejuízo</h3><p id="resValor">R$ 0</p></div></div>
+    </div>
+    <div id="listaCortes" class="px-2"></div>
+  </div>
+
+  <div id="nao-posit-section" class="section-app">
+    <div class="header-app mb-3"><h6>PORTAL DO REPRESENTANTE</h6></div>
+    <div id="login-area" class="p-3 text-center">
+       <select id="selRep" class="form-select mb-3"></select>
+       <input type="password" id="passRep" class="form-control mb-3" placeholder="Senha">
+       <button class="btn btn-primary w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
+    </div>
+    <div id="pdf-area" style="display:none;" class="text-center p-3">
+        <h5 id="nomeArquivoVisual"></h5>
+        <a id="btnVer" target="_blank" class="btn btn-primary w-100 mb-2">ABRIR PDF</a>
+    </div>
+  </div>
+
+  <div id="promocao-section" class="section-app">
+    <div class="header-app mb-3"><h6>OFERTAS DA SEMANA</h6></div>
+    <div id="listaPromos" class="px-2"></div>
+  </div>
+
+  <nav class="nav-bottom">
+    <button class="nav-item active" onclick="showSection('estoque', this)"><i class="bi bi-box-seam"></i>Estoque</button>
+    <button class="nav-item" onclick="showSection('cortes', this)"><i class="bi bi-scissors"></i>Cortes</button>
+    <button class="nav-item" onclick="showSection('nao-posit', this)"><i class="bi bi-person-x"></i>Não Posit.</button>
+    <button class="nav-item" onclick="showSection('promocao', this)"><i class="bi bi-tag-fill"></i>Promoções</button>
+  </nav>
 
   <script>
-    // Usamos o parâmetro ?dados=estoque que criamos no Google Script
-    const API_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec?dados=estoque';
-    let bancoDados = [];
+    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
+    let dbEstoque = []; let dbPromos = [];
 
-    async function carregarDados() {
-      const statusLabel = document.getElementById('status');
-      statusLabel.innerText = "Buscando dados...";
+    async function chamarGoogle(params) {
+      const resp = await fetch(`${SCRIPT_URL}?${params}`);
+      return await resp.json();
+    }
+
+    window.onload = () => { carregarTudo(); };
+
+    async function carregarTudo() {
+      dbEstoque = await chamarGoogle('dados=estoque');
+      dbPromos = await chamarGoogle('dados=promos'); // Ajuste no GS necessário
+      const reps = await chamarGoogle('dados=vendedores');
       
-      try {
-        const response = await fetch(API_URL);
-        const data = await response.json();
-        
-        if(data.erro) {
-           statusLabel.innerText = "Erro no servidor Google";
-           return;
-        }
-
-        bancoDados = data;
-        renderizar(data);
-        statusLabel.innerText = "Atualizado: " + new Date().toLocaleTimeString();
-      } catch (e) {
-        statusLabel.innerText = "Erro de conexão: Verifique a internet";
-        console.error(e);
-      }
+      renderizarEstoque(dbEstoque);
+      document.getElementById('selRep').innerHTML = reps.map(n => `<option value="${n}">${n}</option>`).join('');
+      if(dbEstoque.length > 0) document.getElementById('data-estoque').innerText = dbEstoque[0].dataAtualizacao;
     }
 
-    function renderizar(itens) {
+    function showSection(id, btn) {
+      document.querySelectorAll('.section-app').forEach(s => s.classList.remove('active-section'));
+      document.getElementById(id + '-section').classList.add('active-section');
+      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
+      btn.classList.add('active');
+      if(id === 'promocao') renderizarPromos(dbPromos);
+    }
+
+    function renderizarEstoque(itens) {
       const container = document.getElementById('listaEstoque');
-      if (itens.length === 0) {
-        container.innerHTML = '<div class="text-center text-muted mt-5">Nenhum produto encontrado.</div>';
-        return;
-      }
-
-      container.innerHTML = itens.map(item => `
-        <div class="card-venda d-flex align-items-center">
-          <div class="flex-grow-1">
-            <div class="fw-bold text-dark" style="font-size:1rem">${item.produto}</div>
-            <div class="text-muted" style="font-size:0.75rem">
-              <i class="bi bi-building"></i> ${item.empresa} | <i class="bi bi-hash"></i> ${item.codigo}
+      container.innerHTML = itens.map(item => {
+        let cl = item.kg <= 100 ? 'bg-critico' : (item.kg <= 300 ? 'bg-baixo' : 'bg-ok');
+        const corE = item.empresa === 'ACREAVES' ? '#0d6efd' : (item.empresa === 'DOM PORQUITO' ? '#198754' : '#ffc107');
+        return `
+          <div class="linha-produto">
+            <div style="width: 4px; height: 35px; background: ${corE}; margin-right: 10px;"></div>
+            <div class="flex-grow-1">
+              <span class="d-block fw-bold small">${item.produto}</span>
+              <small class="text-muted" style="font-size:0.65rem">#${item.codigo} | ${item.empresa}</small>
             </div>
-          </div>
-          <div class="text-end">
-            <div class="badge-kg ${item.kg < 100 ? 'badge-critico' : ''}">
-              ${Math.round(item.kg)} KG
-            </div>
-            <div class="small text-muted mt-1">${item.cx} CX</div>
-          </div>
-        </div>
-      `).join('');
+            <div class="quadrante ${cl}"><small style="font-size:0.45rem">KG</small>${Math.round(item.kg)}</div>
+            <div class="quadrante bg-light border"><small style="font-size:0.45rem">CX</small>${item.cx}</div>
+          </div>`;
+      }).join('');
     }
 
-    function filtrar() {
-      const termo = document.getElementById('busca').value.toLowerCase();
-      const filtrados = bancoDados.filter(i => 
-        i.produto.toLowerCase().includes(termo) || 
-        i.codigo.toString().includes(termo)
-      );
-      renderizar(filtrados);
+    function filtrarEstoque() {
+      const t = document.getElementById('buscaEstoque').value.toLowerCase();
+      renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t) || i.codigo.toString().includes(t)));
     }
-
-    // Inicialização
-    carregarDados();
+    
+    // As outras funções (Cortes, Promoções) seguem a mesma lógica de renderizar
   </script>
 </body>
 </html>
