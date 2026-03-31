@@ -253,8 +253,16 @@
 
       const filtered = dbCortes.filter(d => {
         const dataRow = d.data ? d.data.split('T')[0] : "";
+        
+        // CORREÇÃO AQUI: Ajuste para reconhecer 'DPA' como 'DOM PORQUITO'
+        let empresaMatch = true;
+        if (fE) {
+          const termoBusca = (fE === 'DPA') ? 'DOM PORQUITO' : fE;
+          empresaMatch = (d.empresa && d.empresa.toUpperCase() === termoBusca);
+        }
+
         return (!fV || d.vendedor == fV) &&
-               (!fE || (d.empresa && d.empresa.toUpperCase() === (fE === 'DPA' ? 'DOM PORQUITO' : fE))) &&
+               empresaMatch &&
                (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
                (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
                (!dI || dataRow >= dI) &&
