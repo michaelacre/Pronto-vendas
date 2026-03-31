@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PRONTO PRA VENDA</title>
+  <link rel="manifest" href="manifest.json">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+  <style>
+    :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
+    body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin-bottom: 70px; }
+    .header-app { background: var(--jarvis-blue); color: white; padding: 15px; text-align: center; border-bottom: 4px solid var(--jarvis-accent); }
+    .card-venda { background: white; border-radius: 12px; padding: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); margin-bottom: 10px; display: flex; align-items: center; }
+    .btn-refresh { position: fixed; bottom: 20px; right: 20px; width: 55px; height: 55px; border-radius: 50%; background: var(--jarvis-blue); color: white; border: none; box-shadow: 0 4px 12px rgba(0,0,0,0.3); z-index: 1000; }
+  </style>
+</head>
+<body>
+
+  <div class="header-app shadow-sm mb-3">
+    <h6 class="mb-0">SISTEMA DE VENDAS</h6>
+    <small id="status" style="font-size: 0.7rem; color: #00d4ff;">Conectando...</small>
+  </div>
+
+  <div class="container">
+    <input type="text" id="busca" class="form-control mb-3 shadow-sm" placeholder="🔍 Buscar produto..." onkeyup="filtrar()">
+    <div id="listaEstoque"></div>
+  </div>
+
+  <button class="btn-refresh" onclick="carregarDados()"><i class="bi bi-arrow-clockwise fs-3"></i></button>
+
+  <script>
+    const API_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
+    let bancoDados = [];
+
+    async function carregarDados() {
+      document.getElementById('status').innerText = "Sincronizando...";
+      try {
+        const r = await fetch(API_URL);
+        const d = await r.json();
+        bancoDados = d;
+        renderizar(d);
+        document.getElementById('status').innerText = "Atualizado em " + new Date().toLocaleTimeString();
+      } catch (e) {
+        document.getElementById('status').innerText = "Erro de conexão";
+      }
+    }
+
+    function renderizar(itens) {
+      const container = document.getElementById('listaEstoque');
+      container.innerHTML = itens.map(item => `
+        <div class="card-venda">
+          <div class="flex-grow-1">
+            <div class="fw-bold" style="font-size:0.85rem">${item.produto}</div>
+            <div class="text-muted" style="font-size:0.65rem">${item.empresa} | #${item.codigo}</div>
+          </div>
+          <div class="text-end">
+            <span class="badge ${item.kg < 100 ? 'bg-danger' : 'bg-success'}" style="font-size:0.8rem">${Math.round(item.kg)} KG</span>
+            <div style="font-size:0.6rem; color:#888">${item.cx} CX</div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function filtrar() {
+      const t = document.getElementById('busca').value.toLowerCase();
+      renderizar(bancoDados.filter(i => i.produto.toLowerCase().includes(t)));
+    }
+
+    carregarDados();
+  </script>
+</body>
+</html>
