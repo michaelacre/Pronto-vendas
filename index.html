@@ -43,17 +43,9 @@
         <h6 class="mb-0">PRONTO PRA VENDAS</h6>
         <span id="data-estoque" class="data-atualizacao">Sincronizando...</span>
       </div>
-      <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
+      <button onclick="carregarTudo()" class="btn btn-sm text-white p-0"><i id="icon-refresh" class="bi bi-arrow-clockwise fs-4"></i></button>
     </div>
-    <div class="p-2 sticky-top" style="top:0; z-index:1001; background:#f8f9fa">
-      <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="filtrarEstoque()">
-      <div class="d-flex gap-1 overflow-auto pb-1">
-        <button class="btn btn-sm btn-dark" onclick="filtrarEmpresa('TODOS')">TODOS</button>
-        <button class="btn btn-sm btn-primary" onclick="filtrarEmpresa('ACREAVES')">ACREAVES</button>
-        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORQUITO')">D.PORQUITO</button>
-        <button class="btn btn-sm btn-warning text-dark" onclick="filtrarEmpresa('FRIPAL')">FRIPAL</button>
-      </div>
-    </div>
+    <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto..." onkeyup="filtrarEstoque()">
     <div id="listaEstoque"></div>
   </div>
 
@@ -63,19 +55,26 @@
       <div class="col-6"><div class="card-kpi"><h3>Cx Cortadas</h3><p id="resCaixas">0</p></div></div>
       <div class="col-6"><div class="card-kpi"><h3>Prejuízo</h3><p id="resValor">R$ 0</p></div></div>
     </div>
-    <div id="listaCortes" class="px-2"></div>
+    <div class="mt-2" style="height: 150px;"><canvas id="graficoCortes"></canvas></div>
+    <div id="listaCortes" class="px-2 mt-3"></div>
   </div>
 
   <div id="nao-posit-section" class="section-app">
     <div class="header-app mb-3"><h6>PORTAL DO REPRESENTANTE</h6></div>
-    <div id="login-area" class="p-3 text-center">
+    <div id="login-area" class="p-3">
+       <label class="small fw-bold">REPRESENTANTE</label>
        <select id="selRep" class="form-select mb-3"></select>
-       <input type="password" id="passRep" class="form-control mb-3" placeholder="Senha">
-       <button class="btn btn-primary w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
+       <label class="small fw-bold">SENHA</label>
+       <input type="password" id="passRep" class="form-control mb-3" placeholder="****">
+       <button id="btnEntrar" class="btn btn-primary w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
     </div>
     <div id="pdf-area" style="display:none;" class="text-center p-3">
-        <h5 id="nomeArquivoVisual"></h5>
-        <a id="btnVer" target="_blank" class="btn btn-primary w-100 mb-2">ABRIR PDF</a>
+        <div class="card p-4 shadow-sm">
+            <i class="bi bi-file-earmark-pdf text-danger fs-1"></i>
+            <h6 id="nomeArquivoVisual" class="mt-2"></h6>
+            <a id="btnVer" target="_blank" class="btn btn-danger w-100 mb-2">ABRIR PDF</a>
+            <button class="btn btn-light btn-sm" onclick="location.reload()">Sair</button>
+        </div>
     </div>
   </div>
 
@@ -93,23 +92,28 @@
 
   <script>
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
-    let dbEstoque = []; let dbPromos = [];
-
-    async function chamarGoogle(params) {
-      const resp = await fetch(`${SCRIPT_URL}?${params}`);
-      return await resp.json();
-    }
-
-    window.onload = () => { carregarTudo(); };
+    const API_CORTES = 'https://script.google.com/macros/s/AKfycbxls0_YggrbwieuD1yahH78PiiJLpT2ikySnvrrH_DGK5mGknpmJ5XQBuShygMfXrwKGQ/exec';
+    
+    let dbEstoque = [], dbCortes = [], dbPromos = [], meuGrafico = null;
 
     async function carregarTudo() {
-      dbEstoque = await chamarGoogle('dados=estoque');
-      dbPromos = await chamarGoogle('dados=promos'); // Ajuste no GS necessário
-      const reps = await chamarGoogle('dados=vendedores');
-      
-      renderizarEstoque(dbEstoque);
-      document.getElementById('selRep').innerHTML = reps.map(n => `<option value="${n}">${n}</option>`).join('');
-      if(dbEstoque.length > 0) document.getElementById('data-estoque').innerText = dbEstoque[0].dataAtualizacao;
+      document.getElementById('icon-refresh').classList.add('bi-spin');
+      try {
+        const [resE, resP, resV, resC] = await Promise.all([
+          fetch(SCRIPT_URL + '?dados=estoque').then(r => r.json()),
+          fetch(SCRIPT_URL + '?dados=promos').then(r => r.json()),
+          fetch(SCRIPT_URL + '?dados=vendedores').then(r => r.json()),
+          fetch(API_CORTES).then(r => r.json())
+        ]);
+
+        dbEstoque = resE; dbPromos = resP; dbCortes = resC;
+        renderizarEstoque(resE);
+        renderizarPromos(resP);
+        renderizarCortes(resC);
+        document.getElementById('selRep').innerHTML = resV.map(n => `<option value="${n}">${n}</option>`).join('');
+        if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
+      } catch(e) { alert("Erro ao sincronizar dados."); }
+      document.getElementById('icon-refresh').classList.remove('bi-spin');
     }
 
     function showSection(id, btn) {
@@ -117,7 +121,6 @@
       document.getElementById(id + '-section').classList.add('active-section');
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       btn.classList.add('active');
-      if(id === 'promocao') renderizarPromos(dbPromos);
     }
 
     function renderizarEstoque(itens) {
@@ -129,7 +132,7 @@
           <div class="linha-produto">
             <div style="width: 4px; height: 35px; background: ${corE}; margin-right: 10px;"></div>
             <div class="flex-grow-1">
-              <span class="d-block fw-bold small">${item.produto}</span>
+              <span class="d-block fw-bold small text-truncate" style="max-width:180px">${item.produto}</span>
               <small class="text-muted" style="font-size:0.65rem">#${item.codigo} | ${item.empresa}</small>
             </div>
             <div class="quadrante ${cl}"><small style="font-size:0.45rem">KG</small>${Math.round(item.kg)}</div>
@@ -138,12 +141,49 @@
       }).join('');
     }
 
+    function renderizarCortes(dados) {
+      let totalCx = 0, totalRs = 0, vendCont = {};
+      dados.forEach(d => {
+        totalCx += Number(d.caixas) || 0;
+        totalRs += Number(d.valor) || 0;
+        vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + (Number(d.caixas) || 0);
+      });
+      document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
+      document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+      
+      document.getElementById('listaCortes').innerHTML = dados.slice(0, 20).map(d => `
+        <div class="item-corte">
+          <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
+          <small class="text-muted d-block">${d.parceiro} | ${d.vendedor}</small>
+        </div>`).join('');
+      
+      const labels = Object.keys(vendCont).sort((a,b) => vendCont[b] - vendCont[a]).slice(0, 5);
+      if(meuGrafico) meuGrafico.destroy();
+      meuGrafico = new Chart(document.getElementById('graficoCortes'), {
+        type: 'bar',
+        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => vendCont[l]), backgroundColor: '#4CAF50' }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+      });
+    }
+
+    function renderizarPromos(itens) {
+      const container = document.getElementById('listaPromos');
+      container.innerHTML = itens.map(p => `
+        <div class="linha-produto mb-2 shadow-sm" style="border-left: 5px solid #dc3545; border-radius: 8px;">
+          <div class="flex-grow-1 p-2">
+            <span class="d-block fw-bold" style="font-size:0.85rem">${p.produto}</span>
+            <small class="text-muted">COD: ${p.codigo}</small>
+          </div>
+          <div class="p-2"><span class="badge bg-danger fs-6">${p.preco}</span></div>
+        </div>`).join('');
+    }
+
     function filtrarEstoque() {
       const t = document.getElementById('buscaEstoque').value.toLowerCase();
-      renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t) || i.codigo.toString().includes(t)));
+      renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t)));
     }
-    
-    // As outras funções (Cortes, Promoções) seguem a mesma lógica de renderizar
+
+    window.onload = carregarTudo;
   </script>
 </body>
 </html>
