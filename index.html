@@ -147,7 +147,6 @@
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
     const API_CORTES = 'https://script.google.com/macros/s/AKfycbxls0_YggrbwieuD1yahH78PiiJLpT2ikySnvrrH_DGK5mGknpmJ5XQBuShygMfXrwKGQ/exec';
 
-    // FUNÇÃO AUXILIAR PARA CHAMAR O GOOGLE SCRIPT VIA FETCH
     async function callGoogleScript(param, extra = "") {
       const response = await fetch(`${SCRIPT_URL}?dados=${param}${extra}`);
       return await response.json();
@@ -158,7 +157,6 @@
         const res = await callGoogleScript('estoque');
         dbEstoque = res;
         if(res.length > 0) document.getElementById('data-estoque').innerText = res[0].dataAtualizacao;
-        renderizarEstoque(res);
         
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
@@ -187,12 +185,12 @@
         const resE = await callGoogleScript('estoque');
         dbEstoque = resE;
         if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
-        renderizarEstoque(resE);
 
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
-        renderizarPromos(resP);
+        
         renderizarEstoque(dbEstoque);
+        if(document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
         
         icons.forEach(i => i.classList.remove('bi-spin'));
         btn.disabled = false;
@@ -202,7 +200,7 @@
         toast.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2)";
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
-      } catch (e) { btn.disabled = false; }
+      } catch (e) { btn.disabled = false; icons.forEach(i => i.classList.remove('bi-spin')); }
     }
 
     function renderizarEstoque(itens) {
@@ -322,8 +320,10 @@
     }
 
     async function carregarNomesRep() {
-      const nomes = await callGoogleScript('vendedores');
-      document.getElementById('selRep').innerHTML = nomes.map(n => `<option value="${n}">${n}</option>`).join('');
+      try {
+        const nomes = await callGoogleScript('vendedores');
+        document.getElementById('selRep').innerHTML = nomes.map(n => `<option value="${n}">${n}</option>`).join('');
+      } catch (e) {}
     }
 
     async function acessarLista() {
@@ -332,17 +332,19 @@
       const rep = document.getElementById('selRep').value;
       const pass = document.getElementById('passRep').value;
       
-      const res = await callGoogleScript('pdf', `&vendedor=${rep}&senha=${pass}`);
-      btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false;
-      
-      if (res.erro) { document.getElementById('msgErro').innerText = res.erro; }
-      else {
-        document.getElementById('login-area').style.display = 'none';
-        document.getElementById('pdf-area').style.display = 'block';
-        document.getElementById('btnVer').href = res.previewUrl;
-        document.getElementById('btnDownload').href = res.downloadUrl;
-        document.getElementById('nomeArquivoVisual').innerText = res.nomeArquivo;
-      }
+      try {
+        const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
+        btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false;
+        
+        if (res.erro) { document.getElementById('msgErro').innerText = res.erro; }
+        else {
+          document.getElementById('login-area').style.display = 'none';
+          document.getElementById('pdf-area').style.display = 'block';
+          document.getElementById('btnVer').href = res.previewUrl;
+          document.getElementById('btnDownload').href = res.downloadUrl;
+          document.getElementById('nomeArquivoVisual').innerText = res.nomeArquivo;
+        }
+      } catch (e) { btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false; }
     }
 
     function voltarLogin() {
