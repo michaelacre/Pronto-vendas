@@ -396,6 +396,8 @@
       document.getElementById('pdf-area').style.display = 'none';
     }
     // Função para pedir permissão e enviar notificações
+// --- FUNÇÕES DE NOTIFICAÇÃO E VIGILÂNCIA ---
+
 function enviarNotificacao(titulo, mensagem) {
   if (!("Notification" in window)) {
     console.log("Este navegador não suporta notificações.");
@@ -414,6 +416,51 @@ function enviarNotificacao(titulo, mensagem) {
       }
     });
   }
+}
+
+async function vigiarMudancas() {
+  try {
+    const res = await callGoogleScript('estoque'); 
+    if (res && res.length > 0) {
+      const dataPlanilha = res[0].dataAtualizacao;
+      const dataNoApp = document.getElementById('data-estoque').innerText;
+
+      if (dataNoApp !== "Sincronizando..." && dataPlanilha !== dataNoApp) {
+        exibirAlertaMudanca(dataPlanilha);
+      }
+    }
+  } catch (e) {
+    console.log("Vigilância: Planilha ainda ocupada ou offline.");
+  }
+}
+
+function exibirAlertaMudanca(novaData) {
+  if(document.getElementById('alerta-update')) return;
+
+  const alerta = document.createElement('div');
+  alerta.id = "alerta-update";
+  alerta.innerHTML = `
+    <div style="background:#fff3cd; color:#856404; padding:15px; border-radius:12px; border:1px solid #ffeeba; position:fixed; top:80px; left:10px; right:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+        <div style="font-size:0.85rem">
+          <strong>Dados Desatualizados!</strong><br>
+          A planilha foi alterada em: <b>${novaData}</b>.
+        </div>
+      </div>
+      <button onclick="confirmarUpdate(this)" class="btn btn-warning btn-sm w-100 mt-2 fw-bold">ATUALIZAR AGORA</button>
+    </div>
+  `;
+  
+  document.body.appendChild(alerta);
+  enviarNotificacao("JARVIS: Nova Atualização", "Senhor, a planilha foi alterada.");
+}
+
+function confirmarUpdate(btn) {
+  const container = btn.closest('#alerta-update');
+  if(container) container.remove();
+  const refreshBtn = document.querySelector('.icon-refresh').parentElement;
+  atualizarTudo(refreshBtn);
 }
   </script>
 </body>
