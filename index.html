@@ -229,10 +229,25 @@
       renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t) || i.codigo.toString().includes(t)));
     }
 
+// SUBSTITUA APENAS ESTA PARTE:
     function filtrarEmpresa(emp) {
-      renderizarEstoque(emp === 'TODOS' ? dbEstoque : dbEstoque.filter(i => i.empresa === emp));
+      if (emp === 'TODOS') {
+        renderizarEstoque(dbEstoque);
+      } else {
+        renderizarEstoque(dbEstoque.filter(i => {
+          const nomeNaPlanilha = (i.empresa || "").toUpperCase();
+          const termoBusca = emp.toUpperCase();
+          
+          if (termoBusca.includes("DOM") || termoBusca.includes("PORQUITO")) {
+            return nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
+          }
+          
+          return nomeNaPlanilha.includes(termoBusca);
+        }));
+      }
     }
 
+    // MANTENHA ESTA PARTE EXATAMENTE ASSIM:
     async function carregarCortes() {
       try {
         const res = await fetch(API_CORTES);
