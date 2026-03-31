@@ -199,15 +199,23 @@
         renderizarEstoque(dbEstoque);
         if(document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
         
+        // --- ADIÇÃO DA NOTIFICAÇÃO ---
+        enviarNotificacao("JARVIS", "Senhor Michael, os dados foram atualizados com sucesso.");
+        // -----------------------------
+
         icons.forEach(i => i.classList.remove('bi-spin'));
         btn.disabled = false;
         
         const toast = document.createElement('div');
-        toast.innerHTML = "✅ Dados atualizados, Senhor Michael!";
+        toast.innerHTML = "✅ Dados atualizados!";
         toast.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2)";
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
-      } catch (e) { btn.disabled = false; icons.forEach(i => i.classList.remove('bi-spin')); }
+      } catch (e) { 
+        btn.disabled = false; 
+        icons.forEach(i => i.classList.remove('bi-spin')); 
+        console.error("Erro na atualização:", e);
+      }
     }
 
     function renderizarEstoque(itens) {
@@ -387,6 +395,26 @@
       document.getElementById('login-area').style.display = 'block';
       document.getElementById('pdf-area').style.display = 'none';
     }
+    // Função para pedir permissão e enviar notificações
+function enviarNotificacao(titulo, mensagem) {
+  if (!("Notification" in window)) {
+    console.log("Este navegador não suporta notificações.");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    new Notification(titulo, {
+      body: mensagem,
+      icon: "https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg"
+    });
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        new Notification(titulo, { body: mensagem });
+      }
+    });
+  }
+}
   </script>
 </body>
 </html>
