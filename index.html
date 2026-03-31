@@ -159,7 +159,7 @@
       return await response.json();
     }
 
-    window.onload = async () => {
+  window.onload = async () => {
       try {
         const res = await callGoogleScript('estoque');
         dbEstoque = res;
@@ -168,10 +168,19 @@
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
         renderizarEstoque(dbEstoque);
-      } catch (e) { console.error("Erro inicial"); }
+      } catch (e) { 
+        console.error("Erro inicial"); 
+      }
 
       carregarCortes();
       carregarNomesRep();
+
+      // ATIVAÇÃO DA VIGILÂNCIA (Gatilhos do JARVIS)
+      // Verifica mudanças toda vez que o vendedor volta para o App
+      window.addEventListener('focus', vigiarMudancas);
+      
+      // Verifica automaticamente a cada 5 minutos
+      setInterval(vigiarMudancas, 300000); 
     };
 
     function showSection(id, btn) {
