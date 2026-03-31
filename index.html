@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>JARVIS VENDAS</title>
+  
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -12,8 +13,9 @@
     :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
     body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin-bottom: 75px; }
     .header-app { background: var(--jarvis-blue); color: white; padding: 12px; text-align: center; }
-    .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px; border-top: 2px solid var(--jarvis-blue); z-index: 2000; }
-    .nav-item { text-align: center; color: #666; text-decoration: none; font-size: 0.7rem; background: none; border: none; flex: 1; }
+    .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px; border-top: 2px solid var(--jarvis-blue); z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
+    .nav-item { text-align: center; color: #666; text-decoration: none; font-size: 0.7rem; background: none; border: none; flex: 1; outline: none; }
+    .nav-item i { font-size: 1.3rem; display: block; }
     .nav-item.active { color: var(--jarvis-blue); font-weight: bold; }
     .section-app { display: none; padding: 10px; }
     .active-section { display: block; }
@@ -33,33 +35,29 @@
   <div id="estoque-section" class="section-app active-section">
     <div class="header-app d-flex justify-content-between align-items-center px-3 mb-2">
       <div style="width: 32px;"></div>
-      <h6 class="mb-0">SISTEMA DE VENDAS</h6>
+      <div class="text-center">
+        <h6 class="mb-0">PRONTO PRA VENDAS</h6>
+        <span id="data-estoque" style="font-size: 0.7rem; color: #add8e6;">Sincronizando...</span>
+      </div>
       <button onclick="carregarTudo()" class="btn btn-sm text-white p-0"><i id="icon-refresh" class="bi bi-arrow-clockwise fs-4"></i></button>
     </div>
-    <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="filtrarEstoque()">
+    <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="renderizarEstoque()">
     <div id="listaEstoque"></div>
   </div>
 
   <div id="cortes-section" class="section-app">
     <div class="header-app mb-3"><h6>INTELIGÊNCIA DE CORTES</h6></div>
     <div class="row g-2 mb-3 px-2">
-      <div class="col-6"><div class="card-kpi"><small>Cx Cortadas</small><p id="resCaixas" class="mb-0 fw-bold text-success">0</p></div></div>
-      <div class="col-6"><div class="card-kpi"><small>Prejuízo</small><p id="resValor" class="mb-0 fw-bold text-success">R$ 0</p></div></div>
+      <div class="col-6"><div class="card-kpi"><small style="color:#888">Cx Cortadas</small><p id="resCaixas" class="mb-0 fw-bold">0</p></div></div>
+      <div class="col-6"><div class="card-kpi"><small style="color:#888">Prejuízo</small><p id="resValor" class="mb-0 fw-bold">R$ 0</p></div></div>
     </div>
     <div class="bg-white p-2 rounded shadow-sm mb-3 mx-2 small">
       <div class="row g-2">
         <div class="col-6">Início: <input type="date" id="fIni" class="form-control form-control-sm" onchange="filtrarCortes()"></div>
         <div class="col-6">Fim: <input type="date" id="fFim" class="form-control form-control-sm" onchange="filtrarCortes()"></div>
-        <div class="col-12"><input type="text" id="fBuscaCorte" class="form-control form-control-sm" placeholder="Produto ou Cliente..." onkeyup="filtrarCortes()"></div>
-        <div class="col-6">
-          <select id="fEmp" class="form-select form-select-sm" onchange="filtrarCortes()">
-            <option value="">Empresa</option>
-            <option value="ACREAVES">ACREAVES</option>
-            <option value="DOM PORQUITO">D.PORQUITO</option>
-            <option value="FRIPAL">FRIPAL</option>
-          </select>
-        </div>
+        <div class="col-6"><select id="fEmp" class="form-select form-select-sm" onchange="filtrarCortes()"><option value="">Empresa</option><option value="ACREAVES">ACREAVES</option><option value="DOM PORQUITO">D.PORQUITO</option><option value="FRIPAL">FRIPAL</option></select></div>
         <div class="col-6"><select id="fVend" class="form-select form-select-sm" onchange="filtrarCortes()"><option value="">Vendedor</option></select></div>
+        <div class="col-12"><input type="text" id="fBuscaCorte" class="form-control form-control-sm" placeholder="🔍 Produto ou Cliente..." onkeyup="filtrarCortes()"></div>
       </div>
     </div>
     <div style="height: 150px;"><canvas id="graficoCortes"></canvas></div>
@@ -68,19 +66,19 @@
 
   <div id="nao-posit-section" class="section-app">
     <div class="header-app mb-3"><h6>PORTAL DO REPRESENTANTE</h6></div>
-    <div id="login-area" class="p-3 text-center bg-white rounded shadow-sm mx-2">
-       <i class="bi bi-shield-lock text-primary fs-1"></i>
-       <select id="selRep" class="form-select my-3"></select>
-       <input type="password" id="passRep" class="form-control mb-3" placeholder="Senha">
-       <button id="btnEntrar" class="btn btn-primary w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
-       <div id="msgErro" class="text-danger small mt-2"></div>
+    <div id="login-area" class="p-4 text-center bg-white rounded shadow-sm mx-2">
+       <i class="bi bi-shield-lock-fill text-primary fs-1 mb-3"></i>
+       <select id="selRep" class="form-select mb-3"></select>
+       <input type="password" id="passRep" class="form-control mb-3" placeholder="Senha de Acesso">
+       <button id="btnEntrar" class="btn btn-primary w-100 fw-bold" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
+       <div id="msgErro" class="text-danger small mt-3 fw-bold"></div>
     </div>
     <div id="pdf-area" style="display:none;" class="text-center p-3">
-        <div class="card p-4 shadow-sm border-0">
+        <div class="card p-4 shadow-sm border-0" style="border-radius: 15px;">
             <i class="bi bi-file-earmark-pdf-fill text-danger fs-1"></i>
-            <h6 id="nomeArquivoVisual" class="mt-2 text-truncate"></h6>
-            <a id="btnVer" target="_blank" class="btn btn-primary w-100 mb-2">ABRIR PDF NO NAVEGADOR</a>
-            <button class="btn btn-light btn-sm text-muted" onclick="location.reload()">Sair / Trocar Senha</button>
+            <h6 id="nomeArquivoVisual" class="mt-2 text-truncate fw-bold"></h6>
+            <a id="btnVer" target="_blank" class="btn btn-danger w-100 mb-2">ABRIR PDF</a>
+            <button class="btn btn-outline-secondary btn-sm mt-3" onclick="location.reload()">Sair</button>
         </div>
     </div>
   </div>
@@ -91,10 +89,10 @@
   </div>
 
   <nav class="nav-bottom">
-    <button class="nav-item active" onclick="showSection('estoque', this)"><i class="bi bi-box-seam d-block fs-5"></i>Estoque</button>
-    <button class="nav-item" onclick="showSection('cortes', this)"><i class="bi bi-scissors d-block fs-5"></i>Cortes</button>
-    <button class="nav-item" onclick="showSection('nao-posit', this)"><i class="bi bi-person-x d-block fs-5"></i>Não Posit.</button>
-    <button class="nav-item" onclick="showSection('promocao', this)"><i class="bi bi-tag-fill d-block fs-5"></i>Promoções</button>
+    <button class="nav-item active" onclick="showSection('estoque', this)"><i class="bi bi-box-seam"></i>Estoque</button>
+    <button class="nav-item" onclick="showSection('cortes', this)"><i class="bi bi-scissors"></i>Cortes</button>
+    <button class="nav-item" onclick="showSection('nao-posit', this)"><i class="bi bi-person-x"></i>Relatório</button>
+    <button class="nav-item" onclick="showSection('promocao', this)"><i class="bi bi-tag-fill"></i>Ofertas</button>
   </nav>
 
   <script>
@@ -113,22 +111,23 @@
           fetch(API_CORTES).then(r => r.json())
         ]);
         dbEstoque = resE; dbPromos = resP; dbCortes = resC;
+        
         renderizarEstoque();
         renderizarPromos();
         configurarFiltrosCortes();
         document.getElementById('selRep').innerHTML = resV.map(n => `<option value="${n}">${n}</option>`).join('');
-      } catch(e) { console.error(e); }
+        if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
+      } catch(e) { console.error("Erro na sincronização"); }
       document.getElementById('icon-refresh').classList.remove('bi-spin');
     }
 
     function renderizarEstoque() {
       const container = document.getElementById('listaEstoque');
       const busca = document.getElementById('buscaEstoque').value.toLowerCase();
-      
       const filtrados = dbEstoque.filter(i => i.produto.toLowerCase().includes(busca) || i.codigo.toString().includes(busca));
       
       container.innerHTML = filtrados.map(item => {
-        // LÓGICA DO PROCV (Busca se o código do estoque está na lista de promoções)
+        // PROCV de Ofertas
         const emOferta = dbPromos.some(p => String(p.codigo) === String(item.codigo));
         const selo = emOferta ? '<span class="badge bg-danger ms-1" style="font-size:0.5rem">OFERTA %</span>' : '';
         
@@ -142,8 +141,8 @@
               <span class="d-block fw-bold small text-truncate" style="max-width:180px">${item.produto}${selo}</span>
               <small class="text-muted" style="font-size:0.65rem">#${item.codigo} | ${item.empresa}</small>
             </div>
-            <div class="quadrante ${cl}"><small style="font-size:0.45rem">KG</small>${Math.round(item.kg)}</div>
-            <div class="quadrante bg-light border"><small style="font-size:0.45rem">CX</small>${item.cx}</div>
+            <div class="quadrante ${cl}"><small style="font-size:0.4rem">KG</small>${Math.round(item.kg)}</div>
+            <div class="quadrante bg-light border"><small style="font-size:0.4rem">CX</small>${item.cx}</div>
           </div>`;
       }).join('');
     }
@@ -155,16 +154,13 @@
     }
 
     function filtrarCortes() {
-      const fIni = document.getElementById('fIni').value;
-      const fFim = document.getElementById('fFim').value;
-      const fEmp = document.getElementById('fEmp').value;
-      const fVend = document.getElementById('fVend').value;
+      const fIni = document.getElementById('fIni').value, fFim = document.getElementById('fFim').value;
+      const fEmp = document.getElementById('fEmp').value, fVend = document.getElementById('fVend').value;
       const fBusca = document.getElementById('fBuscaCorte').value.toLowerCase();
 
       const filtrados = dbCortes.filter(d => {
         const dataRow = d.data ? d.data.split('T')[0] : "";
-        return (!fIni || dataRow >= fIni) &&
-               (!fFim || dataRow <= fFim) &&
+        return (!fIni || dataRow >= fIni) && (!fFim || dataRow <= fFim) &&
                (!fEmp || (d.empresa && d.empresa.includes(fEmp))) &&
                (!fVend || d.vendedor === fVend) &&
                (!fBusca || d.produto.toLowerCase().includes(fBusca) || d.parceiro.toLowerCase().includes(fBusca));
@@ -172,51 +168,43 @@
 
       let totalCx = 0, totalRs = 0, vendCont = {};
       filtrados.forEach(d => {
-        totalCx += Number(d.caixas) || 0;
-        totalRs += Number(d.valor) || 0;
+        totalCx += Number(d.caixas) || 0; totalRs += Number(d.valor) || 0;
         vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + (Number(d.caixas) || 0);
       });
 
       document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
       document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-      
       document.getElementById('listaCortes').innerHTML = filtrados.slice(0, 30).map(d => `
         <div class="item-corte">
           <div class="top d-flex justify-content-between fw-bold small"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
           <small class="text-muted d-block" style="font-size:0.7rem">${d.parceiro} | ${d.vendedor}</small>
         </div>`).join('');
-
       atualizarGrafico(vendCont);
     }
 
     function atualizarGrafico(obj) {
       const labels = Object.keys(obj).sort((a,b) => obj[b] - obj[a]).slice(0, 5);
-      const data = labels.map(l => obj[l]);
       if(meuGrafico) meuGrafico.destroy();
       meuGrafico = new Chart(document.getElementById('graficoCortes'), {
         type: 'bar',
-        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: data, backgroundColor: '#4CAF50' }] },
+        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#4CAF50' }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
     }
 
     async function acessarLista() {
-      const btn = document.getElementById('btnEntrar');
-      const rep = document.getElementById('selRep').value;
-      const pass = document.getElementById('passRep').value;
+      const btn = document.getElementById('btnEntrar'), rep = document.getElementById('selRep').value, pass = document.getElementById('passRep').value;
       btn.disabled = true; btn.innerText = "Verificando...";
-      
       try {
         const res = await fetch(`${SCRIPT_URL}?dados=pdf&vendedor=${rep}&senha=${pass}`).then(r => r.json());
-        if(res.erro) {
-          document.getElementById('msgErro').innerText = res.erro;
-        } else {
+        if(res.erro) { document.getElementById('msgErro').innerText = res.erro; } 
+        else {
           document.getElementById('login-area').style.display = 'none';
           document.getElementById('pdf-area').style.display = 'block';
           document.getElementById('nomeArquivoVisual').innerText = res.nomeArquivo;
           document.getElementById('btnVer').href = res.previewUrl;
         }
-      } catch(e) { document.getElementById('msgErro').innerText = "Erro ao conectar."; }
+      } catch(e) { document.getElementById('msgErro').innerText = "Erro na conexão."; }
       btn.disabled = false; btn.innerText = "ACESSAR RELATÓRIO";
     }
 
@@ -225,7 +213,7 @@
         <div class="linha-produto mb-2 shadow-sm" style="border-left: 5px solid #dc3545; border-radius: 8px;">
           <div class="flex-grow-1 p-2">
             <span class="d-block fw-bold" style="font-size:0.85rem">${p.produto}</span>
-            <small class="text-muted">COD: ${p.codigo}</small>
+            <small class="text-muted">COD: ${p.codigo} | ${p.categoria || ''}</small>
           </div>
           <div class="p-2 text-end"><span class="badge bg-danger fs-6">${p.preco}</span></div>
         </div>`).join('');
@@ -237,8 +225,6 @@
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       btn.classList.add('active');
     }
-
-    function filtrarEstoque() { renderizarEstoque(); }
 
     window.onload = carregarTudo;
   </script>
