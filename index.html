@@ -324,35 +324,57 @@
     function renderizarPromos(itens) {
       const container = document.getElementById('listaPromos');
       if (!container) return;
+      
       if (!itens || itens.length === 0) { 
         container.innerHTML = "<div class='text-center p-3'>Buscando ofertas...</div>"; 
         return; 
       }
 
       let htmlGeral = "";
+      
+      // 1. Identifica a Data de Validade (Sempre na primeira posição vinda da planilha)
       const dataValidade = (itens[0].produto || "Consulte o Vendedor").toString();
-      htmlGeral = `<div class="alert alert-info text-center py-1 mb-3" style="font-size: 0.8rem; font-weight: bold;">VALIDADE: ${dataValidade}</div>`;
+      htmlGeral = `
+        <div class="alert alert-info text-center py-1 mb-3" style="font-size: 0.8rem; font-weight: bold; border-radius: 0;">
+          VALIDADE: ${dataValidade}
+        </div>`;
 
-      itens.forEach((item) => {
+      // 2. Loop para processar os produtos e divisores
+      itens.forEach((item, index) => {
         const prod = (item.produto || "").toString().trim();
         const preco = (item.preco || "").toString().trim();
         const cod = (item.codigo || "").toString().trim();
 
+        // Ignora a linha da data, o cabeçalho "DESCRIÇÃO" ou linhas vazias
         if (!prod || prod === dataValidade || prod.includes("DESCRIÇÃO") || cod === "COD") return;
 
-        if (preco === "" || preco === "undefined" || preco === "0") {
-          htmlGeral += `<div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm text-center" style="font-size:0.75rem; border-radius:4px; letter-spacing:1px; text-transform: uppercase;">${prod}</div>`;
-        } else {
+        // VERIFICAÇÃO DE SEPARADOR (Se o preço estiver vazio ou for o título da empresa)
+        // Na sua planilha, as empresas não possuem preço preenchido.
+        if (preco === "" || preco === "undefined" || preco === "0" || preco === "PREÇO/ KG") {
           htmlGeral += `
-            <div class="linha-produto mb-2 shadow-sm" style="border-left: 5px solid #dc3545; border-radius: 8px; background:white; display:flex; align-items:center; justify-content:space-between; padding:8px;">
+            <div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" 
+                 style="font-size:0.75rem; border-radius:2px; letter-spacing:1px; text-transform: uppercase;">
+              ${prod}
+            </div>`;
+        } 
+        // PRODUTO NORMAL COM O VISUAL DE BORDA LATERAL
+        else {
+          htmlGeral += `
+            <div class="linha-produto mb-2 shadow-sm" 
+                 style="border-left: 5px solid #dc3545; border-radius: 4px; background:white; display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom: 1px solid #eee;">
               <div class="flex-grow-1" style="min-width:0">
-                <span class="d-block fw-bold text-truncate" style="font-size:0.85rem">${prod}</span>
-                <small class="text-muted" style="font-size:0.7rem">COD: ${cod}</small>
+                <span class="d-block fw-bold text-truncate" style="font-size:0.9rem; color: #333;">${prod}</span>
+                <small class="text-muted" style="font-size:0.7rem; font-weight: 500;">COD: ${cod}</small>
               </div>
-              <div class="ps-2"><span class="badge bg-danger fs-6" style="padding:8px 12px">R$ ${preco}</span></div>
+              <div class="ps-2">
+                <span class="badge bg-danger fs-6" style="padding:8px 12px; font-weight: bold; border-radius: 6px;">
+                  R$ ${preco}
+                </span>
+              </div>
             </div>`;
         }
       });
+
       container.innerHTML = htmlGeral;
     }
 
