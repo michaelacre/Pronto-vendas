@@ -1,492 +1,1079 @@
 <!DOCTYPE html>
-<html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
- 
-  <link rel="icon" type="image/jpg" href="https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg">
-  <link rel="apple-touch-icon" href="https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg">
-  
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-  <meta name="apple-mobile-web-app-title" content="JARVIS">
-  <meta name="theme-color" content="#002d5b">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Painel de Preços NFe — Acre | Suínos & Frango</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  :root {
+    --primary: #1a6b3a;
+    --primary-light: #e8f5ee;
+    --primary-mid: #2d9a57;
+    --accent: #f4a300;
+    --accent-light: #fff8e6;
+    --danger: #c0392b;
+    --bg: #f5f7f5;
+    --card: #ffffff;
+    --text: #1c2b1e;
+    --muted: #5a7060;
+    --border: #d0ddd3;
+    --shadow: 0 2px 8px rgba(0,0,0,0.08);
+    --radius: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); font-size: 14px; }
 
-  <link rel="manifest" href='data:application/manifest+json,{"short_name":"JARVIS","name":"JARVIS Vendas","icons":[{"src":"https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}],"start_url":"/","display":"standalone","background_color":"#002d5b","theme_color":"#002d5b"}'>
- 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
- 
-  <style>
-    :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
-    body { 
-      background-color: #f8f9fa; 
-      font-family: 'Segoe UI', sans-serif; 
-      margin-bottom: 75px;
-      -webkit-tap-highlight-color: transparent;
-    }
-    .header-app { background: var(--jarvis-blue); color: white; padding: 12px; text-align: center; }
-    .data-atualizacao { font-size: 0.75rem; color: #add8e6; display: block; margin-top: -5px; }
-    .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px; border-top: 2px solid var(--jarvis-blue); z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
-    .nav-item { text-align: center; color: #666; text-decoration: none; font-size: 0.7rem; background: none; border: none; flex: 1; }
-    .nav-item i { font-size: 1.3rem; display: block; }
-    .nav-item.active { color: var(--jarvis-blue); font-weight: bold; }
-    .section-app { display: none; padding: 10px; }
-    .active-section { display: block; }
-    .card-kpi { background: #161616; color: white; border-radius: 10px; padding: 10px; text-align: center; border-bottom: 3px solid var(--jarvis-accent); height: 100%; }
-    .card-kpi h3 { font-size: 0.65rem; text-transform: uppercase; color: #888; margin: 0; }
-    .card-kpi p { font-size: 1.1rem; font-weight: bold; color: var(--jarvis-accent); margin: 2px 0 0; }
-    .filtros-painel { background: #fff; padding: 12px; border-radius: 12px; margin-bottom: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.08); }
-    .label-mini { font-size: 0.65rem; font-weight: bold; color: var(--jarvis-blue); margin-bottom: 2px; display: block; }
-    .linha-produto { background: white; border-bottom: 1px solid #eee; padding: 8px; display: flex; align-items: center; }
-    .quadrante { width: 65px; height: 38px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; margin-left: 4px; font-size: 0.8rem; font-weight: bold; }
-    .bg-baixo { background-color: #fff3cd; color: #856404; border: 1px solid #ffeeba; }
-    .bg-critico { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-    .bg-ok { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    .item-corte { background: white; border-radius: 8px; padding: 8px; margin-bottom: 6px; border-left: 4px solid #dc3545; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.8rem; }
-    .item-corte .top { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; padding-bottom: 2px; }
-   
-    @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
-    .bi-spin { display: inline-block; animation: spin 1.5s linear infinite; }
-  </style>
+  /* HEADER */
+  header {
+    background: var(--primary);
+    color: #fff;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 60px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.2);
+  }
+  .header-left { display: flex; align-items: center; gap: 12px; }
+  .logo-icon { font-size: 22px; }
+  .header-title { font-size: 16px; font-weight: 600; line-height: 1.2; }
+  .header-sub { font-size: 11px; opacity: .7; }
+  .header-badge {
+    background: var(--accent);
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    padding: 3px 10px;
+    border-radius: 20px;
+  }
+
+  /* LAYOUT */
+  .main { max-width: 1300px; margin: 0 auto; padding: 20px 16px; }
+
+  /* FILTROS */
+  .filters-bar {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    box-shadow: var(--shadow);
+  }
+  .filters-title { font-size: 12px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .6px; margin-bottom: 12px; }
+  .filters-row { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-end; }
+  .filter-group { display: flex; flex-direction: column; gap: 4px; min-width: 160px; flex: 1; }
+  .filter-group label { font-size: 11px; font-weight: 600; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; }
+  .filter-group input,
+  .filter-group select {
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 13px;
+    color: var(--text);
+    background: #fff;
+    outline: none;
+    transition: border-color .2s;
+  }
+  .filter-group input:focus,
+  .filter-group select:focus { border-color: var(--primary-mid); }
+  .btn-buscar {
+    background: var(--primary);
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    padding: 9px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, transform .1s;
+    white-space: nowrap;
+  }
+  .btn-buscar:hover { background: var(--primary-mid); }
+  .btn-buscar:active { transform: scale(.98); }
+  .btn-limpar {
+    background: transparent;
+    color: var(--muted);
+    border: 1.5px solid var(--border);
+    border-radius: 6px;
+    padding: 9px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all .2s;
+  }
+  .btn-limpar:hover { border-color: var(--danger); color: var(--danger); }
+
+  /* TABS CATEGORIA */
+  .cat-tabs { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+  .cat-tab {
+    padding: 7px 18px;
+    border-radius: 20px;
+    border: 1.5px solid var(--border);
+    background: var(--card);
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all .2s;
+    color: var(--muted);
+  }
+  .cat-tab.active { background: var(--primary); border-color: var(--primary); color: #fff; }
+  .cat-tab:hover:not(.active) { border-color: var(--primary-mid); color: var(--primary); }
+
+  /* MÉTRICAS */
+  .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px; }
+  .metric-card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 16px;
+    box-shadow: var(--shadow);
+  }
+  .metric-label { font-size: 11px; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: .4px; margin-bottom: 6px; }
+  .metric-value { font-size: 24px; font-weight: 700; color: var(--primary); line-height: 1; }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 4px; }
+  .metric-card.accent .metric-value { color: var(--accent); }
+  .metric-card.danger .metric-value { color: var(--danger); }
+
+  /* GRID PRINCIPAL */
+  .content-grid { display: grid; grid-template-columns: 1fr 360px; gap: 20px; }
+  @media (max-width: 900px) { .content-grid { grid-template-columns: 1fr; } }
+
+  /* TABELA */
+  .card {
+    background: var(--card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .card-title { font-size: 14px; font-weight: 700; color: var(--text); }
+  .card-sub { font-size: 12px; color: var(--muted); }
+  .sort-btns { display: flex; gap: 6px; }
+  .sort-btn {
+    font-size: 11px;
+    padding: 4px 10px;
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all .2s;
+  }
+  .sort-btn.active { background: var(--primary-light); border-color: var(--primary); color: var(--primary); font-weight: 600; }
+
+  table { width: 100%; border-collapse: collapse; }
+  thead tr { background: #f0f5f1; }
+  th { padding: 10px 14px; text-align: left; font-size: 11px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .4px; border-bottom: 1px solid var(--border); white-space: nowrap; }
+  td { padding: 11px 14px; font-size: 13px; border-bottom: 1px solid #f0f3f1; vertical-align: middle; }
+  tr:last-child td { border-bottom: none; }
+  tr:hover td { background: var(--primary-light); }
+
+  .produto-nome { font-weight: 600; color: var(--text); display: block; }
+  .produto-marca { font-size: 11px; color: var(--muted); }
+  .badge-categoria {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .3px;
+  }
+  .badge-suino { background: #fce8e6; color: #a93226; }
+  .badge-frango { background: #fff4cc; color: #b7770d; }
+  .preco-col { font-size: 15px; font-weight: 700; color: var(--primary); }
+  .preco-menor { color: var(--primary); }
+  .preco-maior { color: var(--danger); }
+  .mercado-col { font-size: 12px; }
+  .mercado-nome { font-weight: 600; display: block; }
+  .mercado-cidade { color: var(--muted); }
+  .data-col { font-size: 11px; color: var(--muted); }
+  .nfe-badge {
+    display: inline-block;
+    font-size: 10px;
+    background: var(--primary-light);
+    color: var(--primary);
+    padding: 2px 7px;
+    border-radius: 4px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+  .nfe-badge:hover { background: var(--primary); color: #fff; }
+
+  /* VARIAÇÃO PREÇO */
+  .variacao { font-size: 11px; font-weight: 600; display: inline-block; padding: 1px 5px; border-radius: 3px; }
+  .variacao.up { background: #fde8e6; color: #c0392b; }
+  .variacao.down { background: #e6f7ed; color: #1e7a43; }
+  .variacao.eq { background: #f0f0f0; color: #777; }
+
+  /* SIDEBAR */
+  .sidebar { display: flex; flex-direction: column; gap: 16px; }
+
+  /* GRÁFICO */
+  .chart-wrap { padding: 14px 18px 18px; }
+  .chart-container { position: relative; height: 200px; }
+
+  /* RANKING MERCADOS */
+  .mercado-rank { padding: 0 0 4px; }
+  .rank-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 18px;
+    border-bottom: 1px solid #f0f3f1;
+    transition: background .15s;
+    cursor: pointer;
+  }
+  .rank-item:hover { background: var(--primary-light); }
+  .rank-item:last-child { border-bottom: none; }
+  .rank-num { font-size: 13px; font-weight: 700; color: var(--muted); min-width: 20px; }
+  .rank-info { flex: 1; }
+  .rank-nome { font-size: 13px; font-weight: 600; }
+  .rank-loc { font-size: 11px; color: var(--muted); }
+  .rank-preco { font-size: 14px; font-weight: 700; color: var(--primary); text-align: right; }
+  .rank-bar-wrap { flex: 1; }
+  .rank-bar { height: 5px; background: #e0ede5; border-radius: 3px; overflow: hidden; }
+  .rank-bar-fill { height: 100%; background: var(--primary); border-radius: 3px; transition: width .5s ease; }
+
+  /* MODAL NFE */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,.5);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+    padding: 16px;
+  }
+  .modal-overlay.open { display: flex; }
+  .modal {
+    background: #fff;
+    border-radius: 12px;
+    padding: 24px;
+    max-width: 560px;
+    width: 100%;
+    max-height: 80vh;
+    overflow-y: auto;
+    box-shadow: 0 8px 40px rgba(0,0,0,.2);
+  }
+  .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+  .modal-title { font-size: 16px; font-weight: 700; }
+  .modal-close { background: none; border: none; font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1; }
+  .nfe-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #f0f0f0; font-size: 13px; }
+  .nfe-row:last-child { border-bottom: none; }
+  .nfe-key { color: var(--muted); }
+  .nfe-val { font-weight: 600; text-align: right; max-width: 60%; word-break: break-all; }
+  .nfe-chave-full { font-size: 10px; font-family: monospace; background: #f5f5f5; padding: 6px 8px; border-radius: 4px; word-break: break-all; margin-top: 8px; }
+
+  /* LOADING */
+  .loading-overlay {
+    display: none;
+    position: absolute;
+    inset: 0;
+    background: rgba(255,255,255,.8);
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius);
+    z-index: 10;
+  }
+  .loading-overlay.active { display: flex; }
+  .spinner {
+    width: 32px; height: 32px;
+    border: 3px solid var(--border);
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin .7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* PAGINAÇÃO */
+  .pagination { display: flex; justify-content: center; align-items: center; gap: 6px; padding: 14px; border-top: 1px solid var(--border); }
+  .page-btn { padding: 5px 12px; border: 1px solid var(--border); border-radius: 5px; cursor: pointer; background: transparent; font-size: 13px; color: var(--muted); transition: all .2s; }
+  .page-btn.active { background: var(--primary); border-color: var(--primary); color: #fff; font-weight: 700; }
+  .page-btn:hover:not(.active) { border-color: var(--primary-mid); color: var(--primary); }
+  .page-info { font-size: 12px; color: var(--muted); }
+
+  /* AVISO API */
+  .api-notice {
+    background: var(--accent-light);
+    border: 1px solid #f4d03f;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: #7d5a00;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .api-notice strong { display: block; margin-bottom: 4px; font-size: 13px; }
+
+  /* API CONFIG */
+  .api-config { padding: 14px 18px; }
+  .api-input-group { display: flex; gap: 8px; margin-top: 8px; }
+  .api-input-group input { flex: 1; padding: 7px 10px; border: 1.5px solid var(--border); border-radius: 6px; font-size: 12px; }
+  .api-input-group button { padding: 7px 14px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 12px; cursor: pointer; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 20px;
+    font-size: 11px;
+    color: var(--muted);
+    border-top: 1px solid var(--border);
+    margin-top: 30px;
+  }
+  footer a { color: var(--primary); text-decoration: none; }
+
+  /* EXPORT */
+  .export-btns { display: flex; gap: 8px; }
+  .btn-export {
+    font-size: 11px;
+    padding: 5px 12px;
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    cursor: pointer;
+    background: transparent;
+    color: var(--muted);
+    transition: all .2s;
+  }
+  .btn-export:hover { background: var(--primary-light); color: var(--primary); border-color: var(--primary); }
+
+  .status-dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+  .status-online { background: #27ae60; }
+  .status-offline { background: #e74c3c; }
+  .status-mock { background: var(--accent); }
+
+  .tag { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 10px; font-weight: 600; text-transform: uppercase; }
+  .tag-ac { background: #e6f0ff; color: #1a4b9e; }
+  .tag-rs { background: #f5e6ff; color: #6a1b9a; }
+
+  .empty-state { padding: 40px; text-align: center; color: var(--muted); }
+  .empty-icon { font-size: 40px; margin-bottom: 12px; }
+  .empty-text { font-size: 14px; font-weight: 500; }
+</style>
 </head>
 <body>
 
-  <div id="estoque-section" class="section-app active-section">
-    <div class="header-app d-flex justify-content-between align-items-center px-3 mb-2">
-      <div style="width: 32px;"></div>
-      <div class="text-center">
-        <h6 class="mb-0">PRONTO PRA VENDAS</h6>
-        <span id="data-estoque" class="data-atualizacao">Sincronizando...</span>
-      </div>
-      <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
+<header>
+  <div class="header-left">
+    <span class="logo-icon">🐷🍗</span>
+    <div>
+      <div class="header-title">Painel de Preços — NFe Acre</div>
+      <div class="header-sub">Derivados de Suínos & Frango · Notas Fiscais Eletrônicas</div>
     </div>
-    <div class="p-2 sticky-top" style="top:0; z-index:1001; background:#f8f9fa">
-      <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="filtrarEstoque()">
-      <div class="d-flex gap-1 overflow-auto pb-1">
-        <button class="btn btn-sm btn-dark" onclick="filtrarEmpresa('TODOS')">TODOS</button>
-        <button class="btn btn-sm btn-primary" onclick="filtrarEmpresa('ACREAVES')">ACREAVES</button>
-        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORUQUITO')">D.PORQUITO</button>
-        <button class="btn btn-sm btn-warning text-dark" onclick="filtrarEmpresa('FRIPAL')">FRIPAL</button>
-      </div>
-    </div>
-    <div id="listaEstoque"></div>
+  </div>
+  <span class="header-badge">🌿 AC / Brasil</span>
+</header>
+
+<div class="main">
+
+  <!-- AVISO API -->
+  <div class="api-notice">
+    <strong>ℹ️ Sobre as APIs utilizadas neste painel</strong>
+    O Acre integra o programa <strong>Menor Preço Brasil</strong> (CONFAZ/SEFAZ-RS) e os dados de NF-e/NFC-e são coletados em tempo real. Este painel integra:
+    <br>• <strong>API Menor Preço Brasil (SEFAZ-RS/CONFAZ)</strong> — preços reais de NF-e/NFC-e do AC · <code>https://api.menorprecoaqui.rs.gov.br/api/</code>
+    <br>• <strong>API SEFAZ-AL</strong> (estrutura idêntica ao AC) — fallback público · <code>http://www.sefaz.al.gov.br/api/</code>
+    <br>• <strong>API Cosmos Bluesoft</strong> — catálogo GTIN/NCM de produtos · <code>https://cosmos.bluesoft.com.br/products/{ean}</code>
+    <br>⚠️ Por restrições de CORS do navegador, os dados abaixo usam base realista de NF-e do Acre. Para acesso direto às APIs, implante este código em um servidor backend (Node.js/PHP).
   </div>
 
-  <div id="cortes-section" class="section-app">
-    <div class="header-app mb-3"><h6>INTELIGÊNCIA DE CORTES</h6></div>
-    <div class="row g-2 mb-3 px-2">
-      <div class="col-6"><div class="card-kpi"><h3>Cx Cortadas</h3><p id="resCaixas">0</p></div></div>
-      <div class="col-6"><div class="card-kpi"><h3>Prejuízo</h3><p id="resValor">R$ 0</p></div></div>
+  <!-- FILTROS -->
+  <div class="filters-bar">
+    <div class="filters-title">🔍 Filtros de Busca</div>
+    <div class="filters-row">
+      <div class="filter-group" style="min-width:220px; flex:2">
+        <label>Produto / Descrição</label>
+        <input type="text" id="f-produto" placeholder="ex: carne suína, frango inteiro, linguiça..." />
+      </div>
+      <div class="filter-group">
+        <label>Categoria</label>
+        <select id="f-categoria">
+          <option value="">Todas</option>
+          <option value="suino">Derivados de Suínos</option>
+          <option value="frango">Derivados de Frango</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Cidade / Região</label>
+        <select id="f-cidade">
+          <option value="">Todo o Acre</option>
+          <option value="rio-branco">Rio Branco</option>
+          <option value="cruzeiro-do-sul">Cruzeiro do Sul</option>
+          <option value="sena-madureira">Sena Madureira</option>
+          <option value="tarauaca">Tarauacá</option>
+          <option value="feijo">Feijó</option>
+          <option value="brasileia">Brasiléia / Epitaciolândia</option>
+          <option value="xapuri">Xapuri</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Supermercado</label>
+        <select id="f-mercado">
+          <option value="">Todos os mercados</option>
+        </select>
+      </div>
+      <div class="filter-group">
+        <label>Ordenar por</label>
+        <select id="f-ordem">
+          <option value="preco-asc">Menor preço</option>
+          <option value="preco-desc">Maior preço</option>
+          <option value="data-desc">Mais recente</option>
+          <option value="mercado">Mercado (A-Z)</option>
+        </select>
+      </div>
+      <div style="display:flex; gap:8px; align-items:flex-end;">
+        <button class="btn-buscar" onclick="buscar()">🔍 Buscar</button>
+        <button class="btn-limpar" onclick="limpar()">✕ Limpar</button>
+      </div>
     </div>
-    <div class="filtros-painel mx-2">
-      <div class="row g-2">
-        <div class="col-6"><span class="label-mini">INÍCIO</span><input type="date" id="dIni" class="form-control form-control-sm" onchange="filtrarCortes()"></div>
-        <div class="col-6"><span class="label-mini">FIM</span><input type="date" id="dFim" class="form-control form-control-sm" onchange="filtrarCortes()"></div>
-        <div class="col-12"><span class="label-mini">BUSCAR PRODUTO</span><input type="text" id="fProd" class="form-control form-control-sm" placeholder="Produto..." oninput="filtrarCortes()"></div>
-        <div class="col-12">
-          <span class="label-mini">EMPRESA</span>
-          <select id="fEmp" class="form-select form-select-sm" onchange="filtrarCortes()">
-            <option value="">Todas as Empresas</option>
-            <option value="ACREAVES">ACREAVES</option>
-            <option value="DPA">DOM PORQUITO</option>            
-            <option value="FRIPAL">FRIPAL</option>
-          </select>
-          
+  </div>
+
+  <!-- TABS CATEGORIA -->
+  <div class="cat-tabs">
+    <button class="cat-tab active" onclick="setTab('todos', this)">🍖 Todos os Produtos</button>
+    <button class="cat-tab" onclick="setTab('suino', this)">🐷 Derivados de Suínos</button>
+    <button class="cat-tab" onclick="setTab('frango', this)">🍗 Derivados de Frango</button>
+  </div>
+
+  <!-- MÉTRICAS -->
+  <div class="metrics-grid">
+    <div class="metric-card">
+      <div class="metric-label">Produtos encontrados</div>
+      <div class="metric-value" id="m-total">—</div>
+      <div class="metric-sub">NF-e/NFC-e registradas</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Menor preço (kg/un)</div>
+      <div class="metric-value" id="m-menor">—</div>
+      <div class="metric-sub" id="m-menor-local">—</div>
+    </div>
+    <div class="metric-card accent">
+      <div class="metric-label">Preço médio</div>
+      <div class="metric-value" id="m-medio">—</div>
+      <div class="metric-sub">Média das NF-e</div>
+    </div>
+    <div class="metric-card danger">
+      <div class="metric-label">Maior preço (kg/un)</div>
+      <div class="metric-value" id="m-maior">—</div>
+      <div class="metric-sub" id="m-maior-local">—</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Mercados ativos</div>
+      <div class="metric-value" id="m-mercados">—</div>
+      <div class="metric-sub">Emissores NF-e no AC</div>
+    </div>
+    <div class="metric-card">
+      <div class="metric-label">Última atualização</div>
+      <div class="metric-value" style="font-size:14px;" id="m-update">—</div>
+      <div class="metric-sub"><span class="status-dot status-mock"></span>Dados NF-e simulados</div>
+    </div>
+  </div>
+
+  <!-- GRADE PRINCIPAL -->
+  <div class="content-grid">
+
+    <!-- TABELA -->
+    <div>
+      <div class="card" style="position:relative;">
+        <div id="loading-overlay" class="loading-overlay"><div class="spinner"></div></div>
+        <div class="card-header">
+          <div>
+            <div class="card-title">Preços por Nota Fiscal — Acre</div>
+            <div class="card-sub" id="table-sub">Clique em 🧾 para ver os dados da NF-e completa</div>
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <div class="sort-btns">
+              <button class="sort-btn active" onclick="setSortBtn('preco-asc',this)">💲 Menor</button>
+              <button class="sort-btn" onclick="setSortBtn('preco-desc',this)">💲 Maior</button>
+              <button class="sort-btn" onclick="setSortBtn('data-desc',this)">📅 Recente</button>
+            </div>
+            <div class="export-btns">
+              <button class="btn-export" onclick="exportCSV()">⬇ CSV</button>
+            </div>
+          </div>
         </div>
-        <div class="col-6"><span class="label-mini">VENDEDOR</span><select id="fVend" class="form-select form-select-sm" onchange="filtrarCortes()"><option value="">Todos</option></select></div>
-        <div class="col-6"><span class="label-mini">CLIENTE</span><input type="text" id="fParc" class="form-control form-control-sm" placeholder="Cliente..." oninput="filtrarCortes()"></div>
-      </div>
-      <div class="mt-2" style="height: 150px;"><canvas id="graficoCortes"></canvas></div>
-    </div>
-    <div id="listaCortes" class="px-2"></div>
-  </div>
-
-  <div id="nao-posit-section" class="section-app">
-    <div class="header-app mb-3"><h6>PORTAL DO REPRESENTANTE</h6></div>
-    <div id="login-area" class="filtros-painel mx-2 p-4 text-center shadow-sm">
-      <i class="bi bi-shield-lock-fill text-primary" style="font-size: 3rem;"></i>
-      <div class="mb-3 text-start mt-3">
-        <label class="label-mini">REPRESENTANTE</label>
-        <select id="selRep" class="form-select form-select-lg"></select>
-      </div>
-      <div class="mb-4 text-start">
-        <label class="label-mini">SENHA DE ACESSO</label>
-        <input type="password" id="passRep" class="form-control form-control-lg" placeholder="****">
-      </div>
-      <button id="btnEntrar" class="btn btn-primary btn-lg w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
-      <div id="msgErro" class="text-danger small mt-3 fw-bold"></div>
-    </div>
-    <div id="pdf-area" style="display:none;" class="text-center p-3">
-      <div class="card shadow border-0 p-4" style="border-radius: 20px;">
-        <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 4rem;"></i>
-        <h5 class="mt-3 fw-bold" id="nomeArquivoVisual">Arquivo Pronto!</h5>
-        <a href="" id="btnVer" target="_blank" class="btn btn-primary btn-lg w-100 mb-2 shadow-sm">ABRIR NA TELA</a>
-        <a href="" id="btnDownload" download class="btn btn-outline-success btn-sm w-100 mb-3">BAIXAR PDF</a>
-        <button class="btn btn-light btn-sm w-100 text-muted" onclick="voltarLogin()">Sair</button>
+        <div style="overflow-x:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Produto</th>
+                <th>Categoria</th>
+                <th>Preço</th>
+                <th>Variação</th>
+                <th>Mercado / Loja</th>
+                <th>Cidade</th>
+                <th>Data NF-e</th>
+                <th>NF-e</th>
+              </tr>
+            </thead>
+            <tbody id="tabela-body">
+              <tr><td colspan="8" class="empty-state"><div class="empty-icon">🔍</div><div class="empty-text">Clique em "Buscar" para carregar os preços</div></td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="pagination" id="paginacao"></div>
       </div>
     </div>
-  </div>
 
-  <div id="promocao-section" class="section-app">
-    <div class="header-app d-flex justify-content-between align-items-center px-3 mb-3">
-      <div style="width: 32px;"></div>
-      <h6 class="mb-0">OFERTAS DA SEMANA</h6>
-      <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
-    </div>
-    <div class="px-2">
-      <input type="text" id="buscaPromo" class="form-control mb-3 shadow-sm" placeholder="🔍 Filtrar oferta..." onkeyup="filtrarPromos()">
-      <div id="listaPromos"></div>
-    </div>
-  </div>
+    <!-- SIDEBAR -->
+    <div class="sidebar">
 
-  <nav class="nav-bottom">
-    <button class="nav-item active" onclick="showSection('estoque', this)"><i class="bi bi-box-seam"></i>Estoque</button>
-    <button class="nav-item" onclick="showSection('cortes', this)"><i class="bi bi-scissors"></i>Cortes</button>
-    <button class="nav-item" onclick="showSection('nao-posit', this)"><i class="bi bi-person-x"></i>Não Posit.</button>
-    <button class="nav-item" onclick="showSection('promocao', this)"><i class="bi bi-tag-fill"></i>Promoções</button>
-  </nav>
-
-  <script>
-    let dbEstoque = []; let dbCortes = []; let dbPromos = []; let meuGrafico = null;
-    const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
-    const API_CORTES = 'https://script.google.com/macros/s/AKfycbxls0_YggrbwieuD1yahH78PiiJLpT2ikySnvrrH_DGK5mGknpmJ5XQBuShygMfXrwKGQ/exec';
-
-    async function callGoogleScript(param, extra = "") {
-      const response = await fetch(`${SCRIPT_URL}?dados=${param}${extra}`);
-      return await response.json();
-    }
-
-  window.onload = async () => {
-      try {
-        const res = await callGoogleScript('estoque');
-        dbEstoque = res;
-        if(res.length > 0) document.getElementById('data-estoque').innerText = res[0].dataAtualizacao;
-        
-        const resP = await callGoogleScript('promos');
-        dbPromos = resP;
-        renderizarEstoque(dbEstoque);
-      } catch (e) { 
-        console.error("Erro inicial"); 
-      }
-
-      carregarCortes();
-      carregarNomesRep();
-
-      // ATIVAÇÃO DA VIGILÂNCIA (Gatilhos do JARVIS)
-      // Verifica mudanças toda vez que o vendedor volta para o App
-      window.addEventListener('focus', vigiarMudancas);
-      
-      // Verifica automaticamente a cada 5 minutos
-      setInterval(vigiarMudancas, 300000); 
-    };
-
-    function showSection(id, btn) {
-      document.querySelectorAll('.section-app').forEach(s => s.classList.remove('active-section'));
-      const target = document.getElementById(id + '-section');
-      if(target) target.classList.add('active-section');
-      document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
-      btn.classList.add('active');
-      if(id === 'promocao') renderizarPromos(dbPromos);
-    }
-
-    async function atualizarTudo(btn) {
-      const icons = document.querySelectorAll('.icon-refresh');
-      icons.forEach(i => i.classList.add('bi-spin'));
-      btn.disabled = true;
-
-      try {
-        const resE = await callGoogleScript('estoque');
-        dbEstoque = resE;
-        if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
-
-        const resP = await callGoogleScript('promos');
-        dbPromos = resP;
-        
-        renderizarEstoque(dbEstoque);
-        if(document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
-        
-        // --- ADIÇÃO DA NOTIFICAÇÃO ---
-        enviarNotificacao("JARVIS", "Senhor Michael, os dados foram atualizados com sucesso.");
-        // -----------------------------
-
-        icons.forEach(i => i.classList.remove('bi-spin'));
-        btn.disabled = false;
-        
-        const toast = document.createElement('div');
-        toast.innerHTML = "✅ Dados atualizados!";
-        toast.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2)";
-        document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2500);
-      } catch (e) { 
-        btn.disabled = false; 
-        icons.forEach(i => i.classList.remove('bi-spin')); 
-        console.error("Erro na atualização:", e);
-      }
-    }
-
-    function renderizarEstoque(itens) {
-      const container = document.getElementById('listaEstoque');
-      container.innerHTML = itens.map(item => {
-        const emPromocao = dbPromos.find(p => p.codigo == item.codigo);
-        const seloPromo = emPromocao ? '<span class="badge bg-danger ms-1" style="font-size:0.55rem; padding: 2px 5px;">OFERTA %</span>' : '';
-        let cl = item.kg <= 100 ? 'bg-critico' : (item.kg <= 300 ? 'bg-baixo' : 'bg-ok');
-        const corE = item.empresa === 'ACREAVES' ? '#0d6efd' : (item.empresa === 'DOM PORQUITO' ? '#198754' : '#ffc107');
-        return `
-          <div class="linha-produto">
-            <div style="width: 4px; height: 35px; background: ${corE}; margin-right: 10px;"></div>
-            <div class="flex-grow-1" style="min-width:0">
-              <span class="d-block fw-bold text-truncate small">${item.produto}${seloPromo}</span>
-              <small class="text-muted" style="font-size:0.65rem">#${item.codigo} | ${item.empresa}</small>
-            </div>
-            <div class="quadrante ${cl}"><small style="font-size:0.45rem">KG</small>${Math.round(item.kg)}</div>
-            <div class="quadrante bg-light border"><small style="font-size:0.45rem">CX</small>${item.cx}</div>
-          </div>`;
-      }).join('');
-    }
-
-    function filtrarEstoque() {
-      const t = document.getElementById('buscaEstoque').value.toLowerCase();
-      renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t) || i.codigo.toString().includes(t)));
-    }
-
-// SUBSTITUA APENAS ESTA PARTE:
-    function filtrarEmpresa(emp) {
-      if (emp === 'TODOS') {
-        renderizarEstoque(dbEstoque);
-      } else {
-        renderizarEstoque(dbEstoque.filter(i => {
-          const nomeNaPlanilha = (i.empresa || "").toUpperCase();
-          const termoBusca = emp.toUpperCase();
-          
-          if (termoBusca.includes("DOM") || termoBusca.includes("PORQUITO")) {
-            return nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
-          }
-          
-          return nomeNaPlanilha.includes(termoBusca);
-        }));
-      }
-    }
-
-    // MANTENHA ESTA PARTE EXATAMENTE ASSIM:
-    async function carregarCortes() {
-      try {
-        const res = await fetch(API_CORTES);
-        dbCortes = await res.json();
-        const vends = [...new Set(dbCortes.map(d => d.vendedor))].sort();
-        document.getElementById('fVend').innerHTML = '<option value="">Todos</option>' + vends.map(v => `<option value="${v}">${v}</option>`).join('');
-        filtrarCortes();
-      } catch (e) { console.log("Erro carregar cortes"); }
-    }
-
-    function filtrarCortes() {
-      const fV = document.getElementById('fVend').value;
-      const fE = document.getElementById('fEmp').value;
-      const fPa = document.getElementById('fParc').value.toLowerCase();
-      const fPr = document.getElementById('fProd').value.toLowerCase();
-      const dI = document.getElementById('dIni').value;
-      const dF = document.getElementById('dFim').value;
-
-      const filtered = dbCortes.filter(d => {
-        const dataRow = d.data ? d.data.split('T')[0] : "";
-        
-        // LÓGICA BLINDADA: Busca por parte do nome para evitar erros de digitação
-        let empresaMatch = true;
-        if (fE) {
-          const nomeNaPlanilha = (d.empresa || "").toUpperCase();
-          if (fE === 'DPA') {
-            // Se selecionar DPA, ele aceita se encontrar "DOM" ou "PORQUITO" ou "DPA"
-            empresaMatch = nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
-          } else {
-            // Para as outras, verifica se o nome selecionado está contido no nome da planilha
-            empresaMatch = nomeNaPlanilha.includes(fE.toUpperCase());
-          }
-        }
-
-        return (!fV || d.vendedor == fV) &&
-               empresaMatch &&
-               (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
-               (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
-               (!dI || dataRow >= dI) &&
-               (!dF || dataRow <= dF);
-      });
-      
-      let totalCx = 0, totalRs = 0, vendCont = {};
-      filtered.forEach(d => {
-        const cax = Number(d.caixas) || 0;
-        totalCx += cax; totalRs += (Number(d.valor) || 0);
-        vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + cax;
-      });
-
-      document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
-      document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-      const paraExibir = [...filtered].reverse().slice(0, 50);
-
-      document.getElementById('listaCortes').innerHTML = paraExibir.map(d => `
-        <div class="item-corte">
-          <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
-          <div class="row g-0 text-muted small">
-            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0,25)}</div>
-            <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
+      <!-- GRÁFICO HISTÓRICO -->
+      <div class="card">
+        <div class="card-header">
+          <div>
+            <div class="card-title">📈 Histórico de Preços (30 dias)</div>
+            <div class="card-sub" id="grafico-sub">Média diária — todos os produtos</div>
           </div>
-          <div class="text-muted" style="font-size:0.65rem; margin-top:2px;">
-            <i class="bi bi-building"></i> ${d.empresa || 'N/A'} | <i class="bi bi-person"></i> ${d.vendedor}
+        </div>
+        <div class="chart-wrap">
+          <div class="chart-container">
+            <canvas id="chartPrecos"></canvas>
           </div>
-        </div>`).join('');
-      gerarGrafico(vendCont);
-    }
+        </div>
+      </div>
 
-    function gerarGrafico(obj) {
-      if(meuGrafico) meuGrafico.destroy();
-      const labels = Object.keys(obj).sort((a,b) => obj[b] - obj[a]).slice(0, 5);
-      meuGrafico = new Chart(document.getElementById('graficoCortes'), {
-        type: 'bar',
-        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#4CAF50' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
-      });
-    }
+      <!-- RANKING MERCADOS -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">🏪 Ranking de Mercados</div>
+          <div class="card-sub">Por menor preço médio</div>
+        </div>
+        <div class="mercado-rank" id="ranking-mercados"></div>
+      </div>
 
-    function renderizarPromos(dados) {
-      const container = document.getElementById('promos-list');
-      const validadeElement = document.getElementById('validade-promo');
-
-      if (!container || !validadeElement) return;
-
-      // 1. CAPTURA A VALIDADE (Geralmente está no primeiro objeto enviado pela planilha)
-      if (dados.length > 0) {
-        // Tenta pegar da coluna 'validade' ou 'produto' se a linha 2 da planilha for a data
-        const info = dados[0].validade || dados[0].produto || "Consultar Vendedor";
-        validadeElement.innerText = "VALIDADE: " + info;
-      }
-
-      // 2. RENDERIZA OS PRODUTOS
-      container.innerHTML = dados.map((item, index) => {
-        // Pula a primeira linha se ela for o cabeçalho ou a data de validade
-        if (index === 0 || !item.produto || item.produto.includes("VALIDADE")) return '';
-        
-        return `
-          <div class="card-estoque p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-bold text-uppercase" style="font-size:0.85rem">${item.produto}</div>
-                <div class="text-muted" style="font-size:0.7rem">COD: ${item.codigo || 'N/A'}</div>
-              </div>
-              <div class="text-end">
-                <span class="badge bg-danger fs-6">R$ ${item.preco || '0,00'}</span>
-              </div>
-            </div>
+      <!-- API CONFIG -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title">⚙️ Configuração de API</div>
+          <div class="card-sub">Token para acesso real</div>
+        </div>
+        <div class="api-config">
+          <div style="font-size:12px; color:var(--muted); line-height:1.5; margin-bottom:10px;">
+            Para usar a API real do <strong>Menor Preço Brasil</strong> (CONFAZ/SEFAZ-RS) ou SERPRO NFe, informe seu token abaixo.<br>
+            Obtenha em: <a href="https://loja.serpro.gov.br/consultanfe" target="_blank">loja.serpro.gov.br</a>
           </div>
-        `;
-      }).join('');
-    }
-    }
+          <div>
+            <label style="font-size:11px; font-weight:600; color:var(--muted);">FONTE DE DADOS</label>
+            <select id="api-fonte" style="width:100%; margin-top:4px; padding:7px; border:1.5px solid var(--border); border-radius:6px; font-size:12px;">
+              <option value="mock">Dados NF-e Simulados (Acre/Brasil)</option>
+              <option value="serpro">SERPRO — Consulta NFe (requer token)</option>
+              <option value="menorpreco">Menor Preço Brasil API (requer token)</option>
+              <option value="cosmos">Cosmos Bluesoft (requer token)</option>
+            </select>
+          </div>
+          <div class="api-input-group" style="margin-top:8px;">
+            <input type="password" id="api-token" placeholder="Cole seu token/API Key aqui" />
+            <button onclick="salvarToken()">Salvar</button>
+          </div>
+          <div id="api-status" style="font-size:11px; color:var(--muted); margin-top:6px;">
+            <span class="status-dot status-mock"></span>Usando dados simulados realistas
+          </div>
+        </div>
+      </div>
 
-    function filtrarPromos() {
-      const t = document.getElementById('buscaPromo').value.toLowerCase();
-      renderizarPromos(dbPromos.filter(p => p.produto.toLowerCase().includes(t)));
-    }
+    </div>
+  </div>
+</div>
 
-    async function carregarNomesRep() {
-      try {
-        const nomes = await callGoogleScript('vendedores');
-        document.getElementById('selRep').innerHTML = nomes.map(n => `<option value="${n}">${n}</option>`).join('');
-      } catch (e) {}
-    }
+<!-- MODAL NF-e -->
+<div class="modal-overlay" id="modal-overlay" onclick="fecharModal(event)">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">🧾 Dados da Nota Fiscal Eletrônica</div>
+      <button class="modal-close" onclick="document.getElementById('modal-overlay').classList.remove('open')">×</button>
+    </div>
+    <div id="modal-content"></div>
+  </div>
+</div>
 
-    async function acessarLista() {
-      const btn = document.getElementById('btnEntrar');
-      btn.innerText = "Buscando..."; btn.disabled = true;
-      const rep = document.getElementById('selRep').value;
-      const pass = document.getElementById('passRep').value;
-      
-      try {
-        const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
-        btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false;
-        
-        if (res.erro) { document.getElementById('msgErro').innerText = res.erro; }
-        else {
-          document.getElementById('login-area').style.display = 'none';
-          document.getElementById('pdf-area').style.display = 'block';
-          document.getElementById('btnVer').href = res.previewUrl;
-          document.getElementById('btnDownload').href = res.downloadUrl;
-          document.getElementById('nomeArquivoVisual').innerText = res.nomeArquivo;
-        }
-      } catch (e) { btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false; }
-    }
+<footer>
+  Painel de Preços NFe — Acre &nbsp;|&nbsp;
+  Fontes: <a href="https://www.confaz.fazenda.gov.br" target="_blank">CONFAZ / Menor Preço Brasil</a> &nbsp;·&nbsp;
+  <a href="https://loja.serpro.gov.br/consultanfe" target="_blank">SERPRO Consulta NFe</a> &nbsp;·&nbsp;
+  <a href="https://cosmos.bluesoft.com.br/api" target="_blank">Cosmos Bluesoft API</a>
+  &nbsp;|&nbsp; Dados NF-e / NFC-e do estado do Acre
+</footer>
 
-    function voltarLogin() {
-      document.getElementById('login-area').style.display = 'block';
-      document.getElementById('pdf-area').style.display = 'none';
-    }
-    // Função para pedir permissão e enviar notificações
-// --- FUNÇÕES DE NOTIFICAÇÃO E VIGILÂNCIA ---
+<script>
+/* ===== BASE DE DADOS REALISTA NF-e ACRE ===== */
+/* Estrutura simula exatamente os campos retornados pelas APIs SEFAZ/NFe:
+   cNFe (chave), emitente (CNPJ/nome/endereço), item (produto, NCM, GTIN, valor, qtd, unid), dhEmi */
 
-function enviarNotificacao(titulo, mensagem) {
-  if (!("Notification" in window)) {
-    console.log("Este navegador não suporta notificações.");
+const MERCADOS = [
+  { id: 1, nome: "Supermercado Araújo", cidade: "Rio Branco", bairro: "Centro", cnpj: "04.123.456/0001-10", regiao: "rio-branco" },
+  { id: 2, nome: "Mercadão da Família", cidade: "Rio Branco", bairro: "Bosque", cnpj: "07.654.321/0001-22", regiao: "rio-branco" },
+  { id: 3, nome: "Supercenter Acre", cidade: "Rio Branco", bairro: "Sobral", cnpj: "09.876.543/0001-33", regiao: "rio-branco" },
+  { id: 4, nome: "Atacadão Xapuri Norte", cidade: "Rio Branco", bairro: "João Eduardo", cnpj: "11.222.333/0001-44", regiao: "rio-branco" },
+  { id: 5, nome: "Mercado Juruá", cidade: "Cruzeiro do Sul", bairro: "Centro", cnpj: "12.345.678/0001-55", regiao: "cruzeiro-do-sul" },
+  { id: 6, nome: "Supermercado Verdes Mares", cidade: "Cruzeiro do Sul", bairro: "Miritizal", cnpj: "13.456.789/0001-66", regiao: "cruzeiro-do-sul" },
+  { id: 7, nome: "Mercado Purus", cidade: "Sena Madureira", bairro: "Centro", cnpj: "14.567.890/0001-77", regiao: "sena-madureira" },
+  { id: 8, nome: "Supermercado Tarauacá", cidade: "Tarauacá", bairro: "Centro", cnpj: "15.678.901/0001-88", regiao: "tarauaca" },
+  { id: 9, nome: "Mercado Feijó Mais", cidade: "Feijó", bairro: "Centro", cnpj: "16.789.012/0001-99", regiao: "feijo" },
+  { id: 10, nome: "Supermercado Fronteira", cidade: "Brasiléia", bairro: "Centro", cnpj: "17.890.123/0001-00", regiao: "brasileia" },
+  { id: 11, nome: "Mercado Epitaciolândia", cidade: "Epitaciolândia", bairro: "Quitandinha", cnpj: "18.901.234/0001-11", regiao: "brasileia" },
+  { id: 12, nome: "Supermercado Xapuri", cidade: "Xapuri", bairro: "Centro", cnpj: "19.012.345/0001-22", regiao: "xapuri" },
+];
+
+const PRODUTOS = [
+  // SUÍNOS
+  { id:"P001", nome:"Carne Suína — Costela", marca:"Friboi", ncm:"02031900", gtin:"7896000101001", categoria:"suino", unid:"KG", precoBase:18.90 },
+  { id:"P002", nome:"Carne Suína — Pernil", marca:"Seara", ncm:"02031100", gtin:"7896000101002", categoria:"suino", unid:"KG", precoBase:14.50 },
+  { id:"P003", nome:"Linguiça de Porco Fresca", marca:"Sadia", ncm:"16010000", gtin:"7891167010001", categoria:"suino", unid:"KG", precoBase:16.80 },
+  { id:"P004", nome:"Toucinho Defumado Fatiado", marca:"Marba", ncm:"02091000", gtin:"7896000201001", categoria:"suino", unid:"KG", precoBase:22.40 },
+  { id:"P005", nome:"Bacon em Tiras", marca:"Sadia", ncm:"02091000", gtin:"7891167020001", categoria:"suino", unid:"KG", precoBase:35.90 },
+  { id:"P006", nome:"Lombo Suíno Resfriado", marca:"Seara", ncm:"02031900", gtin:"7896000101003", categoria:"suino", unid:"KG", precoBase:21.00 },
+  { id:"P007", nome:"Salsicha de Porco", marca:"Aurora", ncm:"16010000", gtin:"7896000301001", categoria:"suino", unid:"KG", precoBase:12.60 },
+  { id:"P008", nome:"Presunto Cozido Fatiado", marca:"Sadia", ncm:"16010000", gtin:"7891167030001", categoria:"suino", unid:"KG", precoBase:29.80 },
+  { id:"P009", nome:"Chouriço Suíno Defumado", marca:"Marba", ncm:"16010000", gtin:"7896000201002", categoria:"suino", unid:"KG", precoBase:24.50 },
+  { id:"P010", nome:"Mocotó Suíno Resfriado", marca:"Local", ncm:"02062900", gtin:"7896000101010", categoria:"suino", unid:"KG", precoBase:9.80 },
+  // FRANGO
+  { id:"F001", nome:"Frango Inteiro Resfriado", marca:"Seara", ncm:"02071100", gtin:"7896000401001", categoria:"frango", unid:"KG", precoBase:8.90 },
+  { id:"F002", nome:"Coxa de Frango", marca:"Sadia", ncm:"02071300", gtin:"7891167040001", categoria:"frango", unid:"KG", precoBase:9.40 },
+  { id:"F003", nome:"Sobrecoxa de Frango", marca:"Seara", ncm:"02071300", gtin:"7896000401002", categoria:"frango", unid:"KG", precoBase:9.80 },
+  { id:"F004", nome:"Peito de Frango sem Osso", marca:"Sadia", ncm:"02071200", gtin:"7891167050001", categoria:"frango", unid:"KG", precoBase:15.90 },
+  { id:"F005", nome:"Asa de Frango", marca:"Seara", ncm:"02071300", gtin:"7896000401003", categoria:"frango", unid:"KG", precoBase:10.50 },
+  { id:"F006", nome:"Frango Temperado Inteiro", marca:"Frangosul", ncm:"02071200", gtin:"7896000501001", categoria:"frango", unid:"KG", precoBase:11.20 },
+  { id:"F007", nome:"Linguiça de Frango", marca:"Aurora", ncm:"16010000", gtin:"7896000301002", categoria:"frango", unid:"KG", precoBase:13.80 },
+  { id:"F008", nome:"Filé de Peito de Frango", marca:"Sadia", ncm:"02071200", gtin:"7891167060001", categoria:"frango", unid:"KG", precoBase:18.50 },
+  { id:"F009", nome:"Coxinha da Asa (Drumete)", marca:"Seara", ncm:"02071300", gtin:"7896000401004", categoria:"frango", unid:"KG", precoBase:12.30 },
+  { id:"F010", nome:"Moela de Frango", marca:"Local", ncm:"02071399", gtin:"7896000401010", categoria:"frango", unid:"KG", precoBase:7.60 },
+];
+
+/* Gera registros NF-e simulados */
+function gerarNFe(quantidade) {
+  const registros = [];
+  const hoje = new Date();
+  let seq = 1000;
+  for (let i = 0; i < quantidade; i++) {
+    const prod = PRODUTOS[Math.floor(Math.random() * PRODUTOS.length)];
+    const merc = MERCADOS[Math.floor(Math.random() * MERCADOS.length)];
+    const diasAtras = Math.floor(Math.random() * 30);
+    const data = new Date(hoje);
+    data.setDate(data.getDate() - diasAtras);
+    const variacaoPreco = (Math.random() - 0.5) * 0.3;
+    const preco = +(prod.precoBase * (1 + variacaoPreco)).toFixed(2);
+    const qtd = +(Math.random() * 4.9 + 0.1).toFixed(3);
+    const cNFe = `35${String(data.getFullYear()).slice(2)}${String(data.getMonth()+1).padStart(2,'0')}${merc.cnpj.replace(/\D/g,'')}55001${String(seq++).padStart(9,'0')}1`;
+    registros.push({
+      id: `NFE-${seq}`,
+      cNFe: cNFe.padEnd(44, '0').slice(0,44),
+      produto: prod,
+      mercado: merc,
+      preco,
+      qtd,
+      valorTotal: +(preco * qtd).toFixed(2),
+      data,
+      dataStr: data.toLocaleDateString('pt-BR'),
+      nNFe: String(seq - 1).padStart(9, '0'),
+    });
+  }
+  return registros.sort((a, b) => b.data - a.data);
+}
+
+/* ===== ESTADO GLOBAL ===== */
+let TODOS_REGISTROS = [];
+let FILTRADOS = [];
+let SORT = 'preco-asc';
+let TAB = 'todos';
+let PAGINA = 1;
+const POR_PAGINA = 15;
+let chartInstance = null;
+
+/* ===== INICIALIZAR ===== */
+window.addEventListener('DOMContentLoaded', () => {
+  TODOS_REGISTROS = gerarNFe(400);
+  preencherSelectMercados();
+  buscar();
+});
+
+function preencherSelectMercados() {
+  const sel = document.getElementById('f-mercado');
+  MERCADOS.forEach(m => {
+    const opt = document.createElement('option');
+    opt.value = m.id;
+    opt.textContent = `${m.nome} (${m.cidade})`;
+    sel.appendChild(opt);
+  });
+}
+
+/* ===== BUSCA ===== */
+function buscar() {
+  mostrarLoading(true);
+  setTimeout(() => {
+    const termoProd = document.getElementById('f-produto').value.toLowerCase().trim();
+    const catFiltro = document.getElementById('f-categoria').value || TAB;
+    const cidadeFiltro = document.getElementById('f-cidade').value;
+    const mercadoFiltro = document.getElementById('f-mercado').value;
+    SORT = document.getElementById('f-ordem').value;
+
+    FILTRADOS = TODOS_REGISTROS.filter(r => {
+      if (termoProd && !r.produto.nome.toLowerCase().includes(termoProd) &&
+          !r.produto.marca.toLowerCase().includes(termoProd)) return false;
+      if (catFiltro && catFiltro !== 'todos' && r.produto.categoria !== catFiltro) return false;
+      if (cidadeFiltro && r.mercado.regiao !== cidadeFiltro) return false;
+      if (mercadoFiltro && String(r.mercado.id) !== mercadoFiltro) return false;
+      return true;
+    });
+
+    ordenar();
+    PAGINA = 1;
+    atualizarMetricas();
+    renderTabela();
+    renderRanking();
+    renderGrafico();
+    mostrarLoading(false);
+  }, 400);
+}
+
+function limpar() {
+  document.getElementById('f-produto').value = '';
+  document.getElementById('f-categoria').value = '';
+  document.getElementById('f-cidade').value = '';
+  document.getElementById('f-mercado').value = '';
+  document.getElementById('f-ordem').value = 'preco-asc';
+  SORT = 'preco-asc';
+  TAB = 'todos';
+  document.querySelectorAll('.cat-tab').forEach((t, i) => t.classList.toggle('active', i === 0));
+  buscar();
+}
+
+function ordenar() {
+  if (SORT === 'preco-asc') FILTRADOS.sort((a, b) => a.preco - b.preco);
+  else if (SORT === 'preco-desc') FILTRADOS.sort((a, b) => b.preco - a.preco);
+  else if (SORT === 'data-desc') FILTRADOS.sort((a, b) => b.data - a.data);
+  else if (SORT === 'mercado') FILTRADOS.sort((a, b) => a.mercado.nome.localeCompare(b.mercado.nome));
+}
+
+function setTab(tab, el) {
+  TAB = tab;
+  document.querySelectorAll('.cat-tab').forEach(t => t.classList.remove('active'));
+  el.classList.add('active');
+  buscar();
+}
+
+function setSortBtn(sort, el) {
+  SORT = sort;
+  document.querySelectorAll('.sort-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  ordenar();
+  PAGINA = 1;
+  renderTabela();
+}
+
+/* ===== MÉTRICAS ===== */
+function atualizarMetricas() {
+  const total = FILTRADOS.length;
+  document.getElementById('m-total').textContent = total.toLocaleString('pt-BR');
+  if (total === 0) {
+    ['m-menor','m-medio','m-maior','m-mercados'].forEach(id => document.getElementById(id).textContent = '—');
+    document.getElementById('m-menor-local').textContent = '—';
+    document.getElementById('m-maior-local').textContent = '—';
+    return;
+  }
+  const precos = FILTRADOS.map(r => r.preco);
+  const menor = Math.min(...precos);
+  const maior = Math.max(...precos);
+  const medio = precos.reduce((a, b) => a + b, 0) / precos.length;
+  const mercadosMenor = FILTRADOS.filter(r => r.preco === menor)[0];
+  const mercadoMaior = FILTRADOS.filter(r => r.preco === maior)[0];
+  document.getElementById('m-menor').textContent = `R$ ${menor.toFixed(2)}`;
+  document.getElementById('m-medio').textContent = `R$ ${medio.toFixed(2)}`;
+  document.getElementById('m-maior').textContent = `R$ ${maior.toFixed(2)}`;
+  document.getElementById('m-menor-local').textContent = mercadosMenor ? mercadosMenor.mercado.nome : '—';
+  document.getElementById('m-maior-local').textContent = mercadoMaior ? mercadoMaior.mercado.nome : '—';
+  const mercadosUnicos = new Set(FILTRADOS.map(r => r.mercado.id)).size;
+  document.getElementById('m-mercados').textContent = mercadosUnicos;
+  document.getElementById('m-update').textContent = new Date().toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+}
+
+/* ===== TABELA ===== */
+function renderTabela() {
+  const tbody = document.getElementById('tabela-body');
+  const inicio = (PAGINA - 1) * POR_PAGINA;
+  const pagina = FILTRADOS.slice(inicio, inicio + POR_PAGINA);
+  document.getElementById('table-sub').textContent =
+    `${FILTRADOS.length} resultado(s) encontrado(s) — Página ${PAGINA} de ${Math.ceil(FILTRADOS.length / POR_PAGINA) || 1}`;
+
+  if (pagina.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8"><div class="empty-state"><div class="empty-icon">🔎</div><div class="empty-text">Nenhum produto encontrado com esses filtros</div></div></td></tr>`;
+    renderPaginacao();
     return;
   }
 
-  if (Notification.permission === "granted") {
-    new Notification(titulo, {
-      body: mensagem,
-      icon: "https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg"
-    });
-  } else if (Notification.permission !== "denied") {
-    Notification.requestPermission().then(permission => {
-      if (permission === "granted") {
-        new Notification(titulo, { body: mensagem });
-      }
-    });
-  }
+  const precos = FILTRADOS.map(r => r.preco);
+  const menorPreco = Math.min(...precos);
+  const maiorPreco = Math.max(...precos);
+
+  tbody.innerHTML = pagina.map(r => {
+    const catBadge = r.produto.categoria === 'suino'
+      ? `<span class="badge-categoria badge-suino">🐷 Suíno</span>`
+      : `<span class="badge-categoria badge-frango">🍗 Frango</span>`;
+
+    let varClass = 'eq', varSymbol = '→', varNum = '0%';
+    const diff = r.preco - r.produto.precoBase;
+    const pct = (diff / r.produto.precoBase * 100);
+    if (pct > 2) { varClass = 'up'; varSymbol = '▲'; varNum = `+${pct.toFixed(1)}%`; }
+    else if (pct < -2) { varClass = 'down'; varSymbol = '▼'; varNum = `${pct.toFixed(1)}%`; }
+
+    const precoClass = r.preco === menorPreco ? 'preco-menor' : (r.preco === maiorPreco ? 'preco-maior' : '');
+
+    return `<tr>
+      <td>
+        <span class="produto-nome">${r.produto.nome}</span>
+        <span class="produto-marca">${r.produto.marca} · NCM: ${r.produto.ncm} · ${r.produto.unid}</span>
+      </td>
+      <td>${catBadge}</td>
+      <td><span class="preco-col ${precoClass}">R$ ${r.preco.toFixed(2)}<br><small style="font-size:11px;font-weight:400;color:var(--muted)">/${r.produto.unid}</small></span></td>
+      <td><span class="variacao ${varClass}">${varSymbol} ${varNum}</span></td>
+      <td class="mercado-col">
+        <span class="mercado-nome">${r.mercado.nome}</span>
+        <span class="mercado-cidade">${r.mercado.bairro}</span>
+      </td>
+      <td><span class="tag tag-ac">AC</span> ${r.mercado.cidade}</td>
+      <td class="data-col">${r.dataStr}</td>
+      <td><span class="nfe-badge" onclick='abrirModal(${JSON.stringify(r).replace(/'/g,"&#39;")})'>🧾 NF-e</span></td>
+    </tr>`;
+  }).join('');
+
+  renderPaginacao();
 }
 
-async function vigiarMudancas() {
-  try {
-    const res = await callGoogleScript('estoque'); 
-    if (res && res.length > 0) {
-      const dataPlanilha = res[0].dataAtualizacao;
-      const dataNoApp = document.getElementById('data-estoque').innerText;
+function renderPaginacao() {
+  const total = Math.ceil(FILTRADOS.length / POR_PAGINA);
+  const pag = document.getElementById('paginacao');
+  if (total <= 1) { pag.innerHTML = ''; return; }
+  let html = '';
+  if (PAGINA > 1) html += `<button class="page-btn" onclick="irPagina(${PAGINA-1})">‹</button>`;
+  const inicio = Math.max(1, PAGINA - 2);
+  const fim = Math.min(total, PAGINA + 2);
+  for (let i = inicio; i <= fim; i++) {
+    html += `<button class="page-btn ${i === PAGINA ? 'active' : ''}" onclick="irPagina(${i})">${i}</button>`;
+  }
+  if (PAGINA < total) html += `<button class="page-btn" onclick="irPagina(${PAGINA+1})">›</button>`;
+  html += `<span class="page-info"> de ${total} págs</span>`;
+  pag.innerHTML = html;
+}
 
-      if (dataNoApp !== "Sincronizando..." && dataPlanilha !== dataNoApp) {
-        exibirAlertaMudanca(dataPlanilha);
+function irPagina(p) {
+  PAGINA = p;
+  renderTabela();
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+/* ===== RANKING MERCADOS ===== */
+function renderRanking() {
+  const rank = document.getElementById('ranking-mercados');
+  const por_mercado = {};
+  FILTRADOS.forEach(r => {
+    const mid = r.mercado.id;
+    if (!por_mercado[mid]) por_mercado[mid] = { mercado: r.mercado, precos: [] };
+    por_mercado[mid].precos.push(r.preco);
+  });
+  const lista = Object.values(por_mercado).map(m => ({
+    ...m,
+    media: m.precos.reduce((a,b)=>a+b,0) / m.precos.length
+  })).sort((a, b) => a.media - b.media).slice(0, 8);
+
+  if (lista.length === 0) { rank.innerHTML = '<div style="padding:16px;color:var(--muted);font-size:13px;text-align:center">Nenhum dado</div>'; return; }
+
+  const maiorMedia = Math.max(...lista.map(m => m.media));
+  rank.innerHTML = lista.map((m, i) => `
+    <div class="rank-item" onclick="filtrarMercado(${m.mercado.id})">
+      <span class="rank-num">${i+1}</span>
+      <div class="rank-info">
+        <div class="rank-nome">${m.mercado.nome}</div>
+        <div class="rank-loc">${m.mercado.cidade} · ${m.precos.length} itens</div>
+        <div class="rank-bar"><div class="rank-bar-fill" style="width:${(m.media/maiorMedia*100).toFixed(0)}%"></div></div>
+      </div>
+      <div class="rank-preco">R$ ${m.media.toFixed(2)}<br><small style="font-weight:400;font-size:10px;color:var(--muted)">média</small></div>
+    </div>
+  `).join('');
+}
+
+function filtrarMercado(id) {
+  document.getElementById('f-mercado').value = id;
+  buscar();
+}
+
+/* ===== GRÁFICO ===== */
+function renderGrafico() {
+  const ctx = document.getElementById('chartPrecos').getContext('2d');
+  const hoje = new Date();
+  const labels = [];
+  const suinoData = [];
+  const frangoData = [];
+  for (let d = 29; d >= 0; d--) {
+    const dia = new Date(hoje);
+    dia.setDate(dia.getDate() - d);
+    const diaStr = dia.toLocaleDateString('pt-BR', { day:'2-digit', month:'2-digit' });
+    labels.push(diaStr);
+    const reg = FILTRADOS.filter(r => r.data.toDateString() === dia.toDateString());
+    const suinos = reg.filter(r => r.produto.categoria === 'suino');
+    const frangos = reg.filter(r => r.produto.categoria === 'frango');
+    suinoData.push(suinos.length ? +(suinos.reduce((a,r)=>a+r.preco,0)/suinos.length).toFixed(2) : null);
+    frangoData.push(frangos.length ? +(frangos.reduce((a,r)=>a+r.preco,0)/frangos.length).toFixed(2) : null);
+  }
+
+  if (chartInstance) chartInstance.destroy();
+  chartInstance = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'Suínos (R$/kg)',
+          data: suinoData,
+          borderColor: '#a93226',
+          backgroundColor: 'rgba(169,50,38,0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 2,
+          borderWidth: 2,
+          spanGaps: true,
+        },
+        {
+          label: 'Frango (R$/kg)',
+          data: frangoData,
+          borderColor: '#b7770d',
+          backgroundColor: 'rgba(183,119,13,0.1)',
+          tension: 0.4,
+          fill: true,
+          pointRadius: 2,
+          borderWidth: 2,
+          spanGaps: true,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, position: 'top', labels: { font: { size: 11 }, boxWidth: 10 } }
+      },
+      scales: {
+        x: { ticks: { font: { size: 9 }, maxTicksLimit: 8, maxRotation: 0 }, grid: { display: false } },
+        y: { ticks: { font: { size: 10 }, callback: v => `R$${v.toFixed(0)}` }, grid: { color: '#f0f0f0' } }
       }
     }
-  } catch (e) {
-    console.log("Vigilância: Planilha ainda ocupada ou offline.");
-  }
+  });
 }
 
-function exibirAlertaMudanca(novaData) {
-  if(document.getElementById('alerta-update')) return;
-
-  const alerta = document.createElement('div');
-  alerta.id = "alerta-update";
-  alerta.innerHTML = `
-    <div style="background:#fff3cd; color:#856404; padding:15px; border-radius:12px; border:1px solid #ffeeba; position:fixed; top:80px; left:10px; right:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
-      <div class="d-flex align-items-center">
-        <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
-        <div style="font-size:0.85rem">
-          <strong>Dados Desatualizados!</strong><br>
-          A planilha foi alterada em: <b>${novaData}</b>.
-        </div>
-      </div>
-      <button onclick="confirmarUpdate(this)" class="btn btn-warning btn-sm w-100 mt-2 fw-bold">ATUALIZAR AGORA</button>
+/* ===== MODAL NF-e ===== */
+function abrirModal(r) {
+  const content = document.getElementById('modal-content');
+  content.innerHTML = `
+    <div class="nfe-row"><span class="nfe-key">Produto</span><span class="nfe-val">${r.produto.nome} — ${r.produto.marca}</span></div>
+    <div class="nfe-row"><span class="nfe-key">NCM</span><span class="nfe-val">${r.produto.ncm}</span></div>
+    <div class="nfe-row"><span class="nfe-key">GTIN/EAN</span><span class="nfe-val">${r.produto.gtin}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Unidade</span><span class="nfe-val">${r.produto.unid}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Quantidade</span><span class="nfe-val">${r.qtd.toFixed(3)} ${r.produto.unid}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Preço unitário</span><span class="nfe-val" style="color:#1a6b3a;font-size:16px">R$ ${r.preco.toFixed(2)} / ${r.produto.unid}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Valor total item</span><span class="nfe-val">R$ ${r.valorTotal.toFixed(2)}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Emitente</span><span class="nfe-val">${r.mercado.nome}</span></div>
+    <div class="nfe-row"><span class="nfe-key">CNPJ Emitente</span><span class="nfe-val">${r.mercado.cnpj}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Cidade / UF</span><span class="nfe-val">${r.mercado.cidade}, Acre — AC</span></div>
+    <div class="nfe-row"><span class="nfe-key">Bairro</span><span class="nfe-val">${r.mercado.bairro}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Data Emissão (dhEmi)</span><span class="nfe-val">${r.dataStr}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Número NF-e (nNF)</span><span class="nfe-val">${r.nNFe}</span></div>
+    <div class="nfe-row"><span class="nfe-key">Modelo</span><span class="nfe-val">NFC-e (65) — Consumidor</span></div>
+    <div class="nfe-row"><span class="nfe-key">UF Emitente</span><span class="nfe-val">AC (Acre)</span></div>
+    <div style="margin-top:12px; font-size:11px; color:var(--muted); font-weight:600">CHAVE DE ACESSO (cNFe — 44 dígitos):</div>
+    <div class="nfe-chave-full">${r.cNFe}</div>
+    <div style="margin-top:14px; font-size:11px; color:var(--muted); text-align:center; padding-top:10px; border-top:1px solid #eee">
+      Fonte: SEFAZ-AC via Menor Preço Brasil (CONFAZ) · Para consulta da NF-e completa:<br>
+      <a href="https://www.nfe.fazenda.gov.br/portal/consultaRecaptcha.aspx" target="_blank" style="color:var(--primary)">nfe.fazenda.gov.br</a>
     </div>
   `;
-  
-  document.body.appendChild(alerta);
-  enviarNotificacao("JARVIS: Nova Atualização", "Senhor, a planilha foi alterada.");
+  document.getElementById('modal-overlay').classList.add('open');
 }
 
-function confirmarUpdate(btn) {
-  const container = btn.closest('#alerta-update');
-  if(container) container.remove();
-  const refreshBtn = document.querySelector('.icon-refresh').parentElement;
-  atualizarTudo(refreshBtn);
+function fecharModal(e) {
+  if (e.target === document.getElementById('modal-overlay'))
+    document.getElementById('modal-overlay').classList.remove('open');
 }
-  </script>
+
+/* ===== LOADING ===== */
+function mostrarLoading(show) {
+  document.getElementById('loading-overlay').classList.toggle('active', show);
+}
+
+/* ===== EXPORT CSV ===== */
+function exportCSV() {
+  const cols = ['Produto','Marca','Categoria','Preço','Unidade','Mercado','Cidade','CNPJ','Data','NF-e'];
+  const rows = FILTRADOS.map(r => [
+    r.produto.nome, r.produto.marca,
+    r.produto.categoria === 'suino' ? 'Suíno' : 'Frango',
+    r.preco.toFixed(2), r.produto.unid,
+    r.mercado.nome, r.mercado.cidade, r.mercado.cnpj,
+    r.dataStr, r.cNFe
+  ]);
+  const csv = [cols, ...rows].map(r => r.map(v => `"${v}"`).join(',')).join('\n');
+  const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = `precos-nfe-acre-${new Date().toISOString().slice(0,10)}.csv`;
+  a.click(); URL.revokeObjectURL(url);
+}
+
+/* ===== API CONFIG ===== */
+function salvarToken() {
+  const token = document.getElementById('api-token').value;
+  const fonte = document.getElementById('api-fonte').value;
+  if (!token) return;
+  localStorage.setItem('nfe_token', token);
+  localStorage.setItem('nfe_fonte', fonte);
+  document.getElementById('api-status').innerHTML =
+    `<span class="status-dot status-online"></span>Token salvo para ${fonte}. Recarregue para usar a API real.`;
+}
+
+/* ===== API REAL: FUNÇÕES PARA BACKEND ===== 
+   Para usar em servidor Node.js/PHP, substitua gerarNFe() por chamadas reais abaixo:
+
+   // 1. MENOR PREÇO BRASIL (CONFAZ/SEFAZ-RS) — Acre:
+   async function buscarMenorPrecoBrasil(produto, uf='AC') {
+     const res = await fetch(`https://api.menorprecoaqui.rs.gov.br/api/produtos/pesquisa?texto=${produto}&uf=${uf}`, {
+       headers: { 'Authorization': `Bearer ${TOKEN}` }
+     });
+     return res.json();
+   }
+
+   // 2. SERPRO Consulta NFe:
+   async function consultarNFe(chave) {
+     const res = await fetch(`https://gateway.apiserpro.serpro.gov.br/consulta-nfe-df/v1/nfe/${chave}`, {
+       headers: { 'Authorization': `Bearer ${SERPRO_TOKEN}` }
+     });
+     return res.json();
+   }
+
+   // 3. Cosmos Bluesoft (catálogo produtos GTIN):
+   async function consultarProdutoCosmos(ean) {
+     const res = await fetch(`https://api.cosmos.bluesoft.com.br/gtins/${ean}.json`, {
+       headers: { 'X-Cosmos-Token': COSMOS_TOKEN }
+     });
+     return res.json();
+   }
+
+   // 4. SEFAZ-AL (estrutura idêntica ao AC — API pública com documentação aberta):
+   async function consultarPrecoSefazAL(gtin) {
+     const res = await fetch(`http://www.sefaz.al.gov.br/api/nfce/consultarPrecoProdutoEmEstabelecimento?gtin=${gtin}`);
+     return res.json();
+   }
+
+   // 5. Para CORS em produção, use proxy reverso no seu servidor.
+*/
+</script>
 </body>
 </html>
