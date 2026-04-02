@@ -266,27 +266,64 @@
       });
     }
 
-    function renderizarPromos(dados) {
+  function renderizarPromos(dados) {
       const container = document.getElementById('promos-list');
       const validadeElement = document.getElementById('validade-promo');
+      
       if (!container || !validadeElement) return;
-      if (dados.length > 0) {
-        const info = dados[0].validade || dados[0].produto || "Consultar Vendedor";
-        validadeElement.innerText = "VALIDADE: " + info;
+
+      let htmlGeral = "";
+      let dataEncontrada = "Consulte o Vendedor";
+
+      // 1. Localizar a Data de Validade (Varre as primeiras 3 linhas da planilha)
+      for (let i = 0; i < Math.min(dados.length, 3); i++) {
+        const texto = (dados[i].produto || "").toString();
+        // Se a célula contém números e "/" ou "A", provavelmente é a data (ex: 03/04 a 10/04)
+        if (/\d/.test(texto) && (texto.includes("/") || texto.toUpperCase().includes(" A "))) {
+          dataEncontrada = texto;
+          break;
+        }
       }
-      container.innerHTML = dados.map((item, index) => {
-        if (index === 0 || !item.produto || item.produto.includes("VALIDADE")) return '';
-        return `
-          <div class="card p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545; background: white; border-radius: 8px;">
-            <div class="d-flex justify-content-between align-items-center">
-              <div>
-                <div class="fw-bold text-uppercase" style="font-size:0.8rem">${item.produto}</div>
-                <small class="text-muted">COD: ${item.codigo}</small>
+      validadeElement.innerText = "VALIDADE: " + dataEncontrada;
+
+      // 2. Gerar a Lista com Separadores de Empresa
+      dados.forEach((item) => {
+        const prod = (item.produto || "").toString().trim();
+        const preco = (item.preco || "").toString().trim();
+        const cod = (item.codigo || "").toString().trim();
+
+        // Ignora linhas de cabeçalho da planilha e a linha da data
+        if (!prod || prod.includes("DESCRIÇÃO") || prod.includes("OFERTA") || prod === dataEncontrada) {
+          return;
+        }
+
+        // LÓGICA DE SEPARAÇÃO:
+        // Se tem nome de produto mas o preço está vazio, é um título de Empresa (Ex: FRIPAL)
+        if (preco === "" || preco === "undefined" || preco === "0") {
+          htmlGeral += `
+            <div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" 
+                 style="font-size:0.75rem; border-radius:4px; letter-spacing:1px; text-transform: uppercase;">
+              ${prod}
+            </div>`;
+        } 
+        // Se tem preço, é um produto normal
+        else {
+          htmlGeral += `
+            <div class="card p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545; background: white; border-radius: 8px;">
+              <div class="d-flex justify-content-between align-items-center">
+                <div style="min-width:0; flex:1" class="pe-2">
+                  <div class="fw-bold text-uppercase text-truncate" style="font-size:0.8rem">${prod}</div>
+                  <small class="text-muted" style="font-size:0.65rem">COD: ${cod}</small>
+                </div>
+                <div class="text-end">
+                  <span class="badge bg-danger fs-6" style="padding: 8px 12px;">R$ ${preco}</span>
+                </div>
               </div>
-              <span class="badge bg-danger fs-6">R$ ${item.preco}</span>
-            </div>
-          </div>`;
-      }).join('');
+            </div>`;
+        }
+      });
+
+      container.innerHTML = htmlGeral;
     }
 
     function filtrarPromos() {
