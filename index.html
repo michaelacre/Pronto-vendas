@@ -265,67 +265,64 @@
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
       });
     }
+function renderizarPromos(dados) {
+  const container = document.getElementById('promos-list');
+  const validadeElement = document.getElementById('validade-promo');
+  
+  if (!container || !validadeElement) return;
 
-  function renderizarPromos(dados) {
-      const container = document.getElementById('promos-list');
-      const validadeElement = document.getElementById('validade-promo');
-      
-      if (!container || !validadeElement) return;
+  let htmlGeral = "";
+  let dataValidade = "Consulte o Vendedor";
 
-      let htmlGeral = "";
-      let dataEncontrada = "Consulte o Vendedor";
+  // 1. Captura a Data de Validade da Linha 2 (A2)
+  // Na maioria das vezes, o primeiro item do array 'dados' vindo da planilha
+  if (dados.length > 0) {
+    const possivelData = (dados[0].produto || "").toString();
+    if (possivelData.includes("/") || /\d/.test(possivelData)) {
+      dataValidade = possivelData;
+    }
+  }
+  validadeElement.innerText = "VALIDADE: " + dataValidade;
 
-      // 1. Localizar a Data de Validade (Varre as primeiras 3 linhas da planilha)
-      for (let i = 0; i < Math.min(dados.length, 3); i++) {
-        const texto = (dados[i].produto || "").toString();
-        // Se a célula contém números e "/" ou "A", provavelmente é a data (ex: 03/04 a 10/04)
-        if (/\d/.test(texto) && (texto.includes("/") || texto.toUpperCase().includes(" A "))) {
-          dataEncontrada = texto;
-          break;
-        }
-      }
-      validadeElement.innerText = "VALIDADE: " + dataEncontrada;
+  // 2. Processar as linhas
+  dados.forEach((item, index) => {
+    const prod = (item.produto || "").toString().trim();
+    const preco = (item.preco || "").toString().trim();
+    const cod = (item.codigo || "").toString().trim();
 
-      // 2. Gerar a Lista com Separadores de Empresa
-      dados.forEach((item) => {
-        const prod = (item.produto || "").toString().trim();
-        const preco = (item.preco || "").toString().trim();
-        const cod = (item.codigo || "").toString().trim();
-
-        // Ignora linhas de cabeçalho da planilha e a linha da data
-        if (!prod || prod.includes("DESCRIÇÃO") || prod.includes("OFERTA") || prod === dataEncontrada) {
-          return;
-        }
-
-        // LÓGICA DE SEPARAÇÃO:
-        // Se tem nome de produto mas o preço está vazio, é um título de Empresa (Ex: FRIPAL)
-        if (preco === "" || preco === "undefined" || preco === "0") {
-          htmlGeral += `
-            <div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" 
-                 style="font-size:0.75rem; border-radius:4px; letter-spacing:1px; text-transform: uppercase;">
-              ${prod}
-            </div>`;
-        } 
-        // Se tem preço, é um produto normal
-        else {
-          htmlGeral += `
-            <div class="card p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545; background: white; border-radius: 8px;">
-              <div class="d-flex justify-content-between align-items-center">
-                <div style="min-width:0; flex:1" class="pe-2">
-                  <div class="fw-bold text-uppercase text-truncate" style="font-size:0.8rem">${prod}</div>
-                  <small class="text-muted" style="font-size:0.65rem">COD: ${cod}</small>
-                </div>
-                <div class="text-end">
-                  <span class="badge bg-danger fs-6" style="padding: 8px 12px;">R$ ${preco}</span>
-                </div>
-              </div>
-            </div>`;
-        }
-      });
-
-      container.innerHTML = htmlGeral;
+    // Pula a linha da data, linhas vazias ou cabeçalhos de coluna
+    if (!prod || prod === dataValidade || prod === "DESCRIÇÃO DO PRODUTO" || cod === "COD") {
+      return;
     }
 
+    // IDENTIFICAÇÃO DE EMPRESA/SETOR (Linhas como FRIPAL, ACREAVES, DOM PORQUITO)
+    // Se o preço estiver vazio ou for "undefined", tratamos como um separador escuro
+    if (preco === "" || preco === "undefined" || preco === "0") {
+      htmlGeral += `
+        <div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" 
+             style="font-size:0.8rem; border-radius:4px; letter-spacing:1px; text-align:center; text-transform: uppercase;">
+          ${prod}
+        </div>`;
+    } 
+    // PRODUTO NORMAL
+    else {
+      htmlGeral += `
+        <div class="card p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545; background: white; border-radius: 8px;">
+          <div class="d-flex justify-content-between align-items-center">
+            <div style="min-width:0; flex:1" class="pe-2">
+              <div class="fw-bold text-uppercase text-truncate" style="font-size:0.85rem">${prod}</div>
+              <small class="text-muted" style="font-size:0.7rem">COD: ${cod}</small>
+            </div>
+            <div class="text-end">
+              <span class="badge bg-danger fs-6" style="padding: 8px 12px; min-width:85px">R$ ${preco}</span>
+            </div>
+          </div>
+        </div>`;
+    }
+  });
+
+  container.innerHTML = htmlGeral;
+}
     function filtrarPromos() {
       const t = document.getElementById('buscaPromo').value.toLowerCase();
       renderizarPromos(dbPromos.filter(p => p.produto.toLowerCase().includes(t)));
