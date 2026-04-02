@@ -348,8 +348,39 @@
       });
     }
 
-    function renderizarPromos(dados)
-      container.innerHTML = html;
+    function renderizarPromos(dados) {
+      const container = document.getElementById('promos-list');
+      const validadeElement = document.getElementById('validade-promo');
+
+      if (!container || !validadeElement) return;
+
+      // 1. CAPTURA A VALIDADE (Geralmente está no primeiro objeto enviado pela planilha)
+      if (dados.length > 0) {
+        // Tenta pegar da coluna 'validade' ou 'produto' se a linha 2 da planilha for a data
+        const info = dados[0].validade || dados[0].produto || "Consultar Vendedor";
+        validadeElement.innerText = "VALIDADE: " + info;
+      }
+
+      // 2. RENDERIZA OS PRODUTOS
+      container.innerHTML = dados.map((item, index) => {
+        // Pula a primeira linha se ela for o cabeçalho ou a data de validade
+        if (index === 0 || !item.produto || item.produto.includes("VALIDADE")) return '';
+        
+        return `
+          <div class="card-estoque p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545;">
+            <div class="d-flex justify-content-between align-items-center">
+              <div>
+                <div class="fw-bold text-uppercase" style="font-size:0.85rem">${item.produto}</div>
+                <div class="text-muted" style="font-size:0.7rem">COD: ${item.codigo || 'N/A'}</div>
+              </div>
+              <div class="text-end">
+                <span class="badge bg-danger fs-6">R$ ${item.preco || '0,00'}</span>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
     }
 
     function filtrarPromos() {
