@@ -3,19 +3,30 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+
   <link rel="icon" type="image/jpg" href="https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg">
   <link rel="apple-touch-icon" href="https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg">
+
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="JARVIS">
   <meta name="theme-color" content="#002d5b">
+
   <link rel="manifest" href='data:application/manifest+json,{"short_name":"JARVIS","name":"JARVIS Vendas","icons":[{"src":"https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg","sizes":"512x512","type":"image/jpeg","purpose":"any maskable"}],"start_url":"/","display":"standalone","background_color":"#002d5b","theme_color":"#002d5b"}'>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
   <style>
     :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
-    body { background-color: #f8f9fa; font-family: 'Segoe UI', sans-serif; margin-bottom: 75px; -webkit-tap-highlight-color: transparent; }
+    body { 
+      background-color: #f8f9fa; 
+      font-family: 'Segoe UI', sans-serif; 
+      margin-bottom: 75px;
+      -webkit-tap-highlight-color: transparent;
+    }
     .header-app { background: var(--jarvis-blue); color: white; padding: 12px; text-align: center; }
     .data-atualizacao { font-size: 0.75rem; color: #add8e6; display: block; margin-top: -5px; }
     .nav-bottom { position: fixed; bottom: 0; left: 0; right: 0; background: white; display: flex; justify-content: space-around; padding: 8px; border-top: 2px solid var(--jarvis-blue); z-index: 2000; box-shadow: 0 -2px 10px rgba(0,0,0,0.1); }
@@ -36,6 +47,7 @@
     .bg-ok { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     .item-corte { background: white; border-radius: 8px; padding: 8px; margin-bottom: 6px; border-left: 4px solid #dc3545; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.8rem; }
     .item-corte .top { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; padding-bottom: 2px; }
+
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .bi-spin { display: inline-block; animation: spin 1.5s linear infinite; }
   </style>
@@ -52,11 +64,11 @@
       <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
     </div>
     <div class="p-2 sticky-top" style="top:0; z-index:1001; background:#f8f9fa">
-      <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto..." onkeyup="filtrarEstoque()">
+      <input type="text" id="buscaEstoque" class="form-control mb-2 shadow-sm" placeholder="🔍 Buscar produto ou código..." onkeyup="filtrarEstoque()">
       <div class="d-flex gap-1 overflow-auto pb-1">
         <button class="btn btn-sm btn-dark" onclick="filtrarEmpresa('TODOS')">TODOS</button>
         <button class="btn btn-sm btn-primary" onclick="filtrarEmpresa('ACREAVES')">ACREAVES</button>
-        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORQUITO')">D.PORQUITO</button>
+        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORUQUITO')">D.PORQUITO</button>
         <button class="btn btn-sm btn-warning text-dark" onclick="filtrarEmpresa('FRIPAL')">FRIPAL</button>
       </div>
     </div>
@@ -77,29 +89,19 @@
         <div class="col-12">
           <span class="label-mini">EMPRESA</span>
           <select id="fEmp" class="form-select form-select-sm" onchange="filtrarCortes()">
-            <option value="">Todas</option>
+            <option value="">Todas as Empresas</option>
             <option value="ACREAVES">ACREAVES</option>
-            <option value="DPA">DOM PORQUITO</option>
+            <option value="DPA">DOM PORQUITO</option>            
             <option value="FRIPAL">FRIPAL</option>
           </select>
+
         </div>
         <div class="col-6"><span class="label-mini">VENDEDOR</span><select id="fVend" class="form-select form-select-sm" onchange="filtrarCortes()"><option value="">Todos</option></select></div>
         <div class="col-6"><span class="label-mini">CLIENTE</span><input type="text" id="fParc" class="form-control form-control-sm" placeholder="Cliente..." oninput="filtrarCortes()"></div>
       </div>
-      <div class="mt-2" style="height: 120px;"><canvas id="graficoCortes"></canvas></div>
+      <div class="mt-2" style="height: 150px;"><canvas id="graficoCortes"></canvas></div>
     </div>
     <div id="listaCortes" class="px-2"></div>
-  </div>
-
-  <div id="promocao-section" class="section-app">
-    <div class="header-app mb-3">
-      <h6 class="mb-0">OFERTAS DA SEMANA</h6>
-      <small id="validade-promo" style="color: #ffc107; font-weight: bold;">Carregando Validade...</small>
-    </div>
-    <div class="px-2">
-      <input type="text" id="buscaPromo" class="form-control mb-3 shadow-sm" placeholder="🔍 Filtrar oferta..." onkeyup="filtrarPromos()">
-      <div id="promos-list"></div>
-    </div>
   </div>
 
   <div id="nao-posit-section" class="section-app">
@@ -111,7 +113,7 @@
         <select id="selRep" class="form-select form-select-lg"></select>
       </div>
       <div class="mb-4 text-start">
-        <label class="label-mini">SENHA</label>
+        <label class="label-mini">SENHA DE ACESSO</label>
         <input type="password" id="passRep" class="form-control form-control-lg" placeholder="****">
       </div>
       <button id="btnEntrar" class="btn btn-primary btn-lg w-100" onclick="acessarLista()">ACESSAR RELATÓRIO</button>
@@ -121,9 +123,22 @@
       <div class="card shadow border-0 p-4" style="border-radius: 20px;">
         <i class="bi bi-file-earmark-pdf-fill text-danger" style="font-size: 4rem;"></i>
         <h5 class="mt-3 fw-bold" id="nomeArquivoVisual">Arquivo Pronto!</h5>
-        <a href="" id="btnVer" target="_blank" class="btn btn-primary btn-lg w-100 mb-2">ABRIR NA TELA</a>
+        <a href="" id="btnVer" target="_blank" class="btn btn-primary btn-lg w-100 mb-2 shadow-sm">ABRIR NA TELA</a>
+        <a href="" id="btnDownload" download class="btn btn-outline-success btn-sm w-100 mb-3">BAIXAR PDF</a>
         <button class="btn btn-light btn-sm w-100 text-muted" onclick="voltarLogin()">Sair</button>
       </div>
+    </div>
+  </div>
+
+  <div id="promocao-section" class="section-app">
+    <div class="header-app d-flex justify-content-between align-items-center px-3 mb-3">
+      <div style="width: 32px;"></div>
+      <h6 class="mb-0">OFERTAS DA SEMANA</h6>
+      <button onclick="atualizarTudo(this)" class="btn btn-sm text-white p-0"><i class="bi bi-arrow-clockwise fs-4 icon-refresh"></i></button>
+    </div>
+    <div class="px-2">
+      <input type="text" id="buscaPromo" class="form-control mb-3 shadow-sm" placeholder="🔍 Filtrar oferta..." onkeyup="filtrarPromos()">
+      <div id="listaPromos"></div>
     </div>
   </div>
 
@@ -145,19 +160,28 @@
     }
 
     window.onload = async () => {
+  window.onload = async () => {
       try {
         const res = await callGoogleScript('estoque');
         dbEstoque = res;
         if(res.length > 0) document.getElementById('data-estoque').innerText = res[0].dataAtualizacao;
-        
+
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
         renderizarEstoque(dbEstoque);
       } catch (e) { console.error("Erro inicial"); }
+      } catch (e) { 
+        console.error("Erro inicial"); 
+      }
 
       carregarCortes();
       carregarNomesRep();
+
+      // ATIVAÇÃO DA VIGILÂNCIA (Gatilhos do JARVIS)
+      // Verifica mudanças toda vez que o vendedor volta para o App
       window.addEventListener('focus', vigiarMudancas);
+      
+      // Verifica automaticamente a cada 5 minutos
       setInterval(vigiarMudancas, 300000); 
     };
 
@@ -171,32 +195,52 @@
     }
 
     async function atualizarTudo(btn) {
-      const icon = btn.querySelector('.icon-refresh');
-      icon.classList.add('bi-spin');
+      const icons = document.querySelectorAll('.icon-refresh');
+      icons.forEach(i => i.classList.add('bi-spin'));
       btn.disabled = true;
+
       try {
         const resE = await callGoogleScript('estoque');
         dbEstoque = resE;
         if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
+
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
+
         renderizarEstoque(dbEstoque);
-        enviarNotificacao("JARVIS", "Dados atualizados, Senhor Michael.");
-      } catch (e) { console.error(e); }
-      icon.classList.remove('bi-spin');
-      btn.disabled = false;
+        if(document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
+
+        // --- ADIÇÃO DA NOTIFICAÇÃO ---
+        enviarNotificacao("JARVIS", "Senhor Michael, os dados foram atualizados com sucesso.");
+        // -----------------------------
+
+        icons.forEach(i => i.classList.remove('bi-spin'));
+        btn.disabled = false;
+
+        const toast = document.createElement('div');
+        toast.innerHTML = "✅ Dados atualizados!";
+        toast.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2)";
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 2500);
+      } catch (e) { 
+        btn.disabled = false; 
+        icons.forEach(i => i.classList.remove('bi-spin')); 
+        console.error("Erro na atualização:", e);
+      }
     }
 
     function renderizarEstoque(itens) {
       const container = document.getElementById('listaEstoque');
       container.innerHTML = itens.map(item => {
+        const emPromocao = dbPromos.find(p => p.codigo == item.codigo);
+        const seloPromo = emPromocao ? '<span class="badge bg-danger ms-1" style="font-size:0.55rem; padding: 2px 5px;">OFERTA %</span>' : '';
         let cl = item.kg <= 100 ? 'bg-critico' : (item.kg <= 300 ? 'bg-baixo' : 'bg-ok');
-        const corE = item.empresa === 'ACREAVES' ? '#0d6efd' : (item.empresa.includes('DOM') ? '#198754' : '#ffc107');
+        const corE = item.empresa === 'ACREAVES' ? '#0d6efd' : (item.empresa === 'DOM PORQUITO' ? '#198754' : '#ffc107');
         return `
           <div class="linha-produto">
             <div style="width: 4px; height: 35px; background: ${corE}; margin-right: 10px;"></div>
             <div class="flex-grow-1" style="min-width:0">
-              <span class="d-block fw-bold text-truncate small">${item.produto}</span>
+              <span class="d-block fw-bold text-truncate small">${item.produto}${seloPromo}</span>
               <small class="text-muted" style="font-size:0.65rem">#${item.codigo} | ${item.empresa}</small>
             </div>
             <div class="quadrante ${cl}"><small style="font-size:0.45rem">KG</small>${Math.round(item.kg)}</div>
@@ -210,19 +254,25 @@
       renderizarEstoque(dbEstoque.filter(i => i.produto.toLowerCase().includes(t) || i.codigo.toString().includes(t)));
     }
 
+// SUBSTITUA APENAS ESTA PARTE:
     function filtrarEmpresa(emp) {
       if (emp === 'TODOS') {
         renderizarEstoque(dbEstoque);
       } else {
         renderizarEstoque(dbEstoque.filter(i => {
-          const p = (i.empresa || "").toUpperCase();
-          const busca = emp.toUpperCase();
-          if (busca.includes("DOM")) return p.includes("DOM") || p.includes("PORQUITO") || p.includes("DPA");
-          return p.includes(busca);
+          const nomeNaPlanilha = (i.empresa || "").toUpperCase();
+          const termoBusca = emp.toUpperCase();
+
+          if (termoBusca.includes("DOM") || termoBusca.includes("PORQUITO")) {
+            return nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
+          }
+
+          return nomeNaPlanilha.includes(termoBusca);
         }));
       }
     }
 
+    // MANTENHA ESTA PARTE EXATAMENTE ASSIM:
     async function carregarCortes() {
       try {
         const res = await fetch(API_CORTES);
@@ -230,99 +280,95 @@
         const vends = [...new Set(dbCortes.map(d => d.vendedor))].sort();
         document.getElementById('fVend').innerHTML = '<option value="">Todos</option>' + vends.map(v => `<option value="${v}">${v}</option>`).join('');
         filtrarCortes();
-      } catch (e) { console.log("Erro cortes"); }
+      } catch (e) { console.log("Erro carregar cortes"); }
     }
 
     function filtrarCortes() {
       const fV = document.getElementById('fVend').value;
       const fE = document.getElementById('fEmp').value;
+      const fPa = document.getElementById('fParc').value.toLowerCase();
+      const fPr = document.getElementById('fProd').value.toLowerCase();
+      const dI = document.getElementById('dIni').value;
+      const dF = document.getElementById('dFim').value;
+
       const filtered = dbCortes.filter(d => {
-        let empMatch = true;
-        if(fE) {
-          const nomeP = (d.empresa || "").toUpperCase();
-          empMatch = fE === 'DPA' ? (nomeP.includes("DOM") || nomeP.includes("PORQUITO")) : nomeP.includes(fE);
+        const dataRow = d.data ? d.data.split('T')[0] : "";
+
+        // LÓGICA BLINDADA: Busca por parte do nome para evitar erros de digitação
+        let empresaMatch = true;
+        if (fE) {
+          const nomeNaPlanilha = (d.empresa || "").toUpperCase();
+          if (fE === 'DPA') {
+            // Se selecionar DPA, ele aceita se encontrar "DOM" ou "PORQUITO" ou "DPA"
+            empresaMatch = nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
+          } else {
+            // Para as outras, verifica se o nome selecionado está contido no nome da planilha
+            empresaMatch = nomeNaPlanilha.includes(fE.toUpperCase());
+          }
         }
-        return (!fV || d.vendedor == fV) && empMatch;
+
+        return (!fV || d.vendedor == fV) &&
+               empresaMatch &&
+               (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
+               (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
+               (!dI || dataRow >= dI) &&
+               (!dF || dataRow <= dF);
       });
-      let tCx = 0, tRs = 0, vC = {};
-      filtered.forEach(d => { tCx += Number(d.caixas); tRs += Number(d.valor); vC[d.vendedor] = (vC[d.vendedor]||0) + Number(d.caixas); });
-      document.getElementById('resCaixas').innerText = tCx.toFixed(1);
-      document.getElementById('resValor').innerText = tRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
-      document.getElementById('listaCortes').innerHTML = filtered.slice(0,30).map(d => `
+
+      let totalCx = 0, totalRs = 0, vendCont = {};
+      filtered.forEach(d => {
+        const cax = Number(d.caixas) || 0;
+        totalCx += cax; totalRs += (Number(d.valor) || 0);
+        vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + cax;
+      });
+
+      document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
+      document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+      const paraExibir = [...filtered].reverse().slice(0, 50);
+
+      document.getElementById('listaCortes').innerHTML = paraExibir.map(d => `
         <div class="item-corte">
           <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
-          <small class="text-muted">${d.parceiro} | ${d.vendedor}</small>
+          <div class="row g-0 text-muted small">
+            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0,25)}</div>
+            <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
+          </div>
+          <div class="text-muted" style="font-size:0.65rem; margin-top:2px;">
+            <i class="bi bi-building"></i> ${d.empresa || 'N/A'} | <i class="bi bi-person"></i> ${d.vendedor}
+          </div>
         </div>`).join('');
-      gerarGrafico(vC);
+      gerarGrafico(vendCont);
     }
 
     function gerarGrafico(obj) {
       if(meuGrafico) meuGrafico.destroy();
-      const labels = Object.keys(obj).sort((a,b) => obj[b] - obj[a]).slice(0,5);
+      const labels = Object.keys(obj).sort((a,b) => obj[b] - obj[a]).slice(0, 5);
       meuGrafico = new Chart(document.getElementById('graficoCortes'), {
         type: 'bar',
         data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#4CAF50' }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
       });
     }
-function renderizarPromos(dados) {
-  const container = document.getElementById('promos-list');
-  const validadeElement = document.getElementById('validade-promo');
-  
-  if (!container || !validadeElement) return;
 
-  let htmlGeral = "";
-  let dataValidade = "Consulte o Vendedor";
-
-  // 1. Captura a Data de Validade da Linha 2 (A2)
-  // Na maioria das vezes, o primeiro item do array 'dados' vindo da planilha
-  if (dados.length > 0) {
-    const possivelData = (dados[0].produto || "").toString();
-    if (possivelData.includes("/") || /\d/.test(possivelData)) {
-      dataValidade = possivelData;
-    }
-  }
-  validadeElement.innerText = "VALIDADE: " + dataValidade;
-
-  // 2. Processar as linhas
-  dados.forEach((item, index) => {
-    const prod = (item.produto || "").toString().trim();
-    const preco = (item.preco || "").toString().trim();
-    const cod = (item.codigo || "").toString().trim();
-
-    // Pula a linha da data, linhas vazias ou cabeçalhos de coluna
-    if (!prod || prod === dataValidade || prod === "DESCRIÇÃO DO PRODUTO" || cod === "COD") {
-      return;
-    }
-
-    // IDENTIFICAÇÃO DE EMPRESA/SETOR (Linhas como FRIPAL, ACREAVES, DOM PORQUITO)
-    // Se o preço estiver vazio ou for "undefined", tratamos como um separador escuro
-    if (preco === "" || preco === "undefined" || preco === "0") {
-      htmlGeral += `
-        <div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" 
-             style="font-size:0.8rem; border-radius:4px; letter-spacing:1px; text-align:center; text-transform: uppercase;">
-          ${prod}
-        </div>`;
-    } 
-    // PRODUTO NORMAL
-    else {
-      htmlGeral += `
-        <div class="card p-2 mb-2 shadow-sm" style="border-left: 4px solid #dc3545; background: white; border-radius: 8px;">
-          <div class="d-flex justify-content-between align-items-center">
-            <div style="min-width:0; flex:1" class="pe-2">
-              <div class="fw-bold text-uppercase text-truncate" style="font-size:0.85rem">${prod}</div>
-              <small class="text-muted" style="font-size:0.7rem">COD: ${cod}</small>
+    function renderizarPromos(itens) {
+      const container = document.getElementById('listaPromos');
+      if (!itens.length) { container.innerHTML = "Buscando ofertas..."; return; }
+      let html = `<div class="alert alert-info text-center py-1 mb-3" style="font-size: 0.8rem; font-weight: bold;">VALIDADE: ${itens[0].validade}</div>`;
+      let categorias = [...new Set(itens.map(p => p.categoria))];
+      categorias.forEach(cat => {
+        if (cat) html += `<div class="bg-dark text-white px-2 py-1 rounded-1 mb-2 mt-3" style="font-size: 0.75rem; font-weight: bold;">${cat}</div>`;
+        html += itens.filter(p => p.categoria === cat).map(p => `
+          <div class="linha-produto mb-2 shadow-sm" style="border-left: 5px solid #dc3545; border-radius: 8px;">
+            <div class="flex-grow-1 p-2">
+              <span class="d-block fw-bold" style="font-size:0.85rem">${p.produto}</span>
+              <small class="text-muted">COD: ${p.codigo}</small>
             </div>
-            <div class="text-end">
-              <span class="badge bg-danger fs-6" style="padding: 8px 12px; min-width:85px">R$ ${preco}</span>
-            </div>
-          </div>
-        </div>`;
+            <div class="p-2 text-end"><span class="badge bg-danger fs-6">${p.preco}</span></div>
+          </div>`).join('');
+      });
+      container.innerHTML = html;
     }
-  });
 
-  container.innerHTML = htmlGeral;
-}
     function filtrarPromos() {
       const t = document.getElementById('buscaPromo').value.toLowerCase();
       renderizarPromos(dbPromos.filter(p => p.produto.toLowerCase().includes(t)));
@@ -336,61 +382,97 @@ function renderizarPromos(dados) {
     }
 
     async function acessarLista() {
+      const btn = document.getElementById('btnEntrar');
+      btn.innerText = "Buscando..."; btn.disabled = true;
       const rep = document.getElementById('selRep').value;
       const pass = document.getElementById('passRep').value;
+
       try {
         const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
+        btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false;
+
         if (res.erro) { document.getElementById('msgErro').innerText = res.erro; }
         else {
           document.getElementById('login-area').style.display = 'none';
           document.getElementById('pdf-area').style.display = 'block';
           document.getElementById('btnVer').href = res.previewUrl;
+          document.getElementById('btnDownload').href = res.downloadUrl;
           document.getElementById('nomeArquivoVisual').innerText = res.nomeArquivo;
         }
-      } catch (e) {}
+      } catch (e) { btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false; }
     }
 
     function voltarLogin() {
       document.getElementById('login-area').style.display = 'block';
       document.getElementById('pdf-area').style.display = 'none';
     }
+    // Função para pedir permissão e enviar notificações
+// --- FUNÇÕES DE NOTIFICAÇÃO E VIGILÂNCIA ---
 
-    function enviarNotificacao(titulo, mensagem) {
-      if (Notification.permission === "granted") {
-        new Notification(titulo, { body: mensagem, icon: "https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg" });
-      } else if (Notification.permission !== "denied") {
-        Notification.requestPermission();
+function enviarNotificacao(titulo, mensagem) {
+  if (!("Notification" in window)) {
+    console.log("Este navegador não suporta notificações.");
+    return;
+  }
+
+  if (Notification.permission === "granted") {
+    new Notification(titulo, {
+      body: mensagem,
+      icon: "https://www.infoescola.com/wp-content/uploads/2008/10/balanca-comercial-224425375-600x506.jpg"
+    });
+  } else if (Notification.permission !== "denied") {
+    Notification.requestPermission().then(permission => {
+      if (permission === "granted") {
+        new Notification(titulo, { body: mensagem });
+      }
+    });
+  }
+}
+
+async function vigiarMudancas() {
+  try {
+    const res = await callGoogleScript('estoque'); 
+    if (res && res.length > 0) {
+      const dataPlanilha = res[0].dataAtualizacao;
+      const dataNoApp = document.getElementById('data-estoque').innerText;
+
+      if (dataNoApp !== "Sincronizando..." && dataPlanilha !== dataNoApp) {
+        exibirAlertaMudanca(dataPlanilha);
       }
     }
+  } catch (e) {
+    console.log("Vigilância: Planilha ainda ocupada ou offline.");
+  }
+}
 
-    async function vigiarMudancas() {
-      try {
-        const res = await callGoogleScript('estoque'); 
-        if (res && res.length > 0) {
-          const nD = res[0].dataAtualizacao;
-          const aA = document.getElementById('data-estoque').innerText;
-          if (aA !== "Sincronizando..." && nD !== aA) { exibirAlertaMudanca(nD); }
-        }
-      } catch (e) {}
-    }
+function exibirAlertaMudanca(novaData) {
+  if(document.getElementById('alerta-update')) return;
 
-    function exibirAlertaMudanca(novaData) {
-      if(document.getElementById('alerta-update')) return;
-      const alerta = document.createElement('div');
-      alerta.id = "alerta-update";
-      alerta.innerHTML = `
-        <div style="background:#fff3cd; padding:15px; border-radius:12px; position:fixed; top:80px; left:10px; right:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2); border:1px solid #ffeeba;">
-          <strong>Dados Desatualizados!</strong><br><small>Planilha alterada em: ${novaData}</small>
-          <button onclick="confirmarUpdate(this)" class="btn btn-warning btn-sm w-100 mt-2 fw-bold">ATUALIZAR AGORA</button>
-        </div>`;
-      document.body.appendChild(alerta);
-      enviarNotificacao("JARVIS", "Planilha alterada, Senhor.");
-    }
+  const alerta = document.createElement('div');
+  alerta.id = "alerta-update";
+  alerta.innerHTML = `
+    <div style="background:#fff3cd; color:#856404; padding:15px; border-radius:12px; border:1px solid #ffeeba; position:fixed; top:80px; left:10px; right:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
+      <div class="d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+        <div style="font-size:0.85rem">
+          <strong>Dados Desatualizados!</strong><br>
+          A planilha foi alterada em: <b>${novaData}</b>.
+        </div>
+      </div>
+      <button onclick="confirmarUpdate(this)" class="btn btn-warning btn-sm w-100 mt-2 fw-bold">ATUALIZAR AGORA</button>
+    </div>
+  `;
 
-    function confirmarUpdate(btn) {
-      btn.closest('#alerta-update').remove();
-      atualizarTudo(document.querySelector('.icon-refresh').parentElement);
-    }
+  document.body.appendChild(alerta);
+  enviarNotificacao("JARVIS: Nova Atualização", "Senhor, a planilha foi alterada.");
+}
+
+function confirmarUpdate(btn) {
+  const container = btn.closest('#alerta-update');
+  if(container) container.remove();
+  const refreshBtn = document.querySelector('.icon-refresh').parentElement;
+  atualizarTudo(refreshBtn);
+}
   </script>
 </body>
 </html>
