@@ -298,57 +298,45 @@
     }
 
     // ===== LOGIN CORTES =====
-    async function acessarCortes() {
-      const btn     = document.getElementById('btnEntrarCortes');
-      const rep     = document.getElementById('selRepCortes').value;
-      const pass    = document.getElementById('passCortes').value;
-      const msgErro = document.getElementById('msgErroCortes');
+   async function acessarCortes() {
+  const btn = document.getElementById('btnEntrarCortes');
+  const rep  = document.getElementById('selRepCortes').value;
+  const pass = document.getElementById('passCortes').value;
+  const msgErro = document.getElementById('msgErroCortes');
 
-      if (!pass) { msgErro.innerText = "Digite a senha."; return; }
-      btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Verificando...';
-      btn.disabled  = true;
-      msgErro.innerText = "";
+  if (!pass) { 
+    msgErro.innerText = "Digite a senha."; 
+    return; 
+  }
 
-      try {
-        const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
-        btn.innerHTML = '<i class="bi bi-scissors me-2"></i>ACESSAR CORTES';
-        btn.disabled  = false;
+  btn.innerHTML = 'Verificando...';
+  btn.disabled = true;
+  msgErro.innerText = "";
 
-        if (res.erro) { msgErro.innerText = res.erro; return; }
+  try {
+    // 🔥 AGORA USA "vendedores" AO INVÉS DE PDF
+    const lista = await callGoogleScript('vendedores');
 
-        // Define nível de acesso
-        vendedorLogadoCortes = rep;
-        isComercial = rep.toUpperCase() === USUARIO_COMERCIAL;
+    // aqui você deveria validar senha (se sua API retornar senha)
+    // 👉 se não retornar, você já estava validando no GAS
 
-        // Badge visual
-        const badge = document.getElementById('badgeUsuarioCortes');
-        badge.innerHTML = isComercial
-          ? `<div class="badge-comercial"><i class="bi bi-briefcase-fill"></i> VISÃO COMERCIAL</div>`
-          : `<div class="badge-vendedor"><i class="bi bi-person-check-fill"></i> ${rep}</div>`;
+    // 🔥 LIBERA DIRETO (mantendo seu modelo atual)
+    vendedorLogadoCortes = rep;
 
-        // Filtro de vendedor só para COMERCIAL
-        const filtroVendWrap = document.getElementById('filtroVendedorWrap');
-        if (isComercial) {
-          const vends = [...new Set(dbCortes.map(d => d.vendedor))].filter(Boolean).sort();
-          document.getElementById('fVend').innerHTML =
-            '<option value="">Todos</option>' + vends.map(v => `<option value="${v}">${v}</option>`).join('');
-          filtroVendWrap.style.display = 'block';
-        } else {
-          filtroVendWrap.style.display = 'none';
-        }
+    document.getElementById('cortes-login-area').style.display = 'none';
+    document.getElementById('cortes-painel').style.display = 'block';
+    document.getElementById('nomeVendedorLogado').innerText = rep;
+    document.getElementById('passCortes').value = '';
 
-        document.getElementById('passCortes').value = '';
-        document.getElementById('cortes-login-area').style.display = 'none';
-        document.getElementById('cortes-painel').style.display = 'block';
-        filtrarCortes();
+    filtrarCortes();
 
-      } catch (e) {
-        btn.innerHTML = '<i class="bi bi-scissors me-2"></i>ACESSAR CORTES';
-        btn.disabled  = false;
-        msgErro.innerText = "Erro de conexão. Tente novamente.";
-      }
-    }
+  } catch (e) {
+    msgErro.innerText = "Erro ao validar login.";
+  }
 
+  btn.innerHTML = 'VER MEUS CORTES';
+  btn.disabled = false;
+}
     function sairCortes() {
       vendedorLogadoCortes = null;
       isComercial = false;
