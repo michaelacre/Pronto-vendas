@@ -21,9 +21,9 @@
 
   <style>
     :root { --jarvis-blue: #002d5b; --jarvis-accent: #4CAF50; }
-    body { 
-      background-color: #f8f9fa; 
-      font-family: 'Segoe UI', sans-serif; 
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', sans-serif;
       margin-bottom: 75px;
       -webkit-tap-highlight-color: transparent;
     }
@@ -48,12 +48,48 @@
     .item-corte { background: white; border-radius: 8px; padding: 8px; margin-bottom: 6px; border-left: 4px solid #dc3545; box-shadow: 0 1px 3px rgba(0,0,0,0.05); font-size: 0.8rem; }
     .item-corte .top { display: flex; justify-content: space-between; font-weight: bold; border-bottom: 1px solid #f0f0f0; margin-bottom: 4px; padding-bottom: 2px; }
 
+    /* ===== ESTILOS DE PROMOÇÃO ===== */
+    .promo-empresa-header {
+      background: var(--jarvis-blue);
+      color: white;
+      padding: 9px 14px;
+      border-radius: 7px;
+      margin: 18px 0 8px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      letter-spacing: 0.07em;
+      text-transform: uppercase;
+    }
+    .promo-categoria-header {
+      background: #343a40;
+      color: #e9ecef;
+      padding: 5px 11px;
+      border-radius: 4px;
+      margin: 10px 0 6px;
+      font-size: 0.72rem;
+      font-weight: bold;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+    .promo-item {
+      background: white;
+      border-left: 5px solid #dc3545;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 10px;
+      margin-bottom: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.07);
+    }
+
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .bi-spin { display: inline-block; animation: spin 1.5s linear infinite; }
   </style>
 </head>
 <body>
 
+  <!-- ===== ESTOQUE ===== -->
   <div id="estoque-section" class="section-app active-section">
     <div class="header-app d-flex justify-content-between align-items-center px-3 mb-2">
       <div style="width: 32px;"></div>
@@ -75,6 +111,7 @@
     <div id="listaEstoque"></div>
   </div>
 
+  <!-- ===== CORTES ===== -->
   <div id="cortes-section" class="section-app">
     <div class="header-app mb-3"><h6>INTELIGÊNCIA DE CORTES</h6></div>
     <div class="row g-2 mb-3 px-2">
@@ -91,7 +128,7 @@
           <select id="fEmp" class="form-select form-select-sm" onchange="filtrarCortes()">
             <option value="">Todas as Empresas</option>
             <option value="ACREAVES">ACREAVES</option>
-            <option value="DPA">DOM PORQUITO</option>            
+            <option value="DPA">DOM PORQUITO</option>
             <option value="FRIPAL">FRIPAL</option>
           </select>
         </div>
@@ -103,6 +140,7 @@
     <div id="listaCortes" class="px-2"></div>
   </div>
 
+  <!-- ===== PORTAL REPRESENTANTE ===== -->
   <div id="nao-posit-section" class="section-app">
     <div class="header-app mb-3"><h6>PORTAL DO REPRESENTANTE</h6></div>
     <div id="login-area" class="filtros-painel mx-2 p-4 text-center shadow-sm">
@@ -129,6 +167,7 @@
     </div>
   </div>
 
+  <!-- ===== PROMOÇÕES ===== -->
   <div id="promocao-section" class="section-app">
     <div class="header-app d-flex justify-content-between align-items-center px-3 mb-3">
       <div style="width: 32px;"></div>
@@ -141,6 +180,7 @@
     </div>
   </div>
 
+  <!-- ===== NAVEGAÇÃO ===== -->
   <nav class="nav-bottom">
     <button class="nav-item active" onclick="showSection('estoque', this)"><i class="bi bi-box-seam"></i>Estoque</button>
     <button class="nav-item" onclick="showSection('cortes', this)"><i class="bi bi-scissors"></i>Cortes</button>
@@ -158,32 +198,35 @@
       return await response.json();
     }
 
+    // ===== INICIALIZAÇÃO =====
     window.onload = async () => {
       try {
         const res = await callGoogleScript('estoque');
         dbEstoque = res;
-        if(res.length > 0) document.getElementById('data-estoque').innerText = res[0].dataAtualizacao;
+        if (res.length > 0) document.getElementById('data-estoque').innerText = res[0].dataAtualizacao;
 
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
         renderizarEstoque(dbEstoque);
-      } catch (e) { console.error("Erro inicial"); }
+      } catch (e) { console.error("Erro inicial", e); }
 
       carregarCortes();
       carregarNomesRep();
       window.addEventListener('focus', vigiarMudancas);
-      setInterval(vigiarMudancas, 300000); 
+      setInterval(vigiarMudancas, 300000);
     };
 
+    // ===== NAVEGAÇÃO =====
     function showSection(id, btn) {
       document.querySelectorAll('.section-app').forEach(s => s.classList.remove('active-section'));
       const target = document.getElementById(id + '-section');
-      if(target) target.classList.add('active-section');
+      if (target) target.classList.add('active-section');
       document.querySelectorAll('.nav-item').forEach(i => i.classList.remove('active'));
       btn.classList.add('active');
-      if(id === 'promocao') renderizarPromos(dbPromos);
+      if (id === 'promocao') renderizarPromos(dbPromos);
     }
 
+    // ===== ATUALIZAR TUDO =====
     async function atualizarTudo(btn) {
       const icons = document.querySelectorAll('.icon-refresh');
       icons.forEach(i => i.classList.add('bi-spin'));
@@ -192,13 +235,13 @@
       try {
         const resE = await callGoogleScript('estoque');
         dbEstoque = resE;
-        if(resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
+        if (resE.length > 0) document.getElementById('data-estoque').innerText = resE[0].dataAtualizacao;
 
         const resP = await callGoogleScript('promos');
         dbPromos = resP;
 
         renderizarEstoque(dbEstoque);
-        if(document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
+        if (document.getElementById('promocao-section').classList.contains('active-section')) renderizarPromos(dbPromos);
 
         icons.forEach(i => i.classList.remove('bi-spin'));
         btn.disabled = false;
@@ -208,13 +251,14 @@
         toast.style = "position:fixed; top:20px; left:50%; transform:translateX(-50%); background:rgba(0,0,0,0.85); color:white; padding:10px 20px; border-radius:30px; z-index:9999; font-size:0.8rem; box-shadow: 0 4px 12px rgba(0,0,0,0.2)";
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 2500);
-      } catch (e) { 
-        btn.disabled = false; 
-        icons.forEach(i => i.classList.remove('bi-spin')); 
+      } catch (e) {
+        btn.disabled = false;
+        icons.forEach(i => i.classList.remove('bi-spin'));
         console.error("Erro na atualização:", e);
       }
     }
 
+    // ===== ESTOQUE =====
     function renderizarEstoque(itens) {
       const container = document.getElementById('listaEstoque');
       container.innerHTML = itens.map(item => {
@@ -255,6 +299,7 @@
       }
     }
 
+    // ===== CORTES =====
     async function carregarCortes() {
       try {
         const res = await fetch(API_CORTES);
@@ -298,12 +343,12 @@
       });
 
       document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
-      document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', {style:'currency', currency:'BRL'});
+      document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
       document.getElementById('listaCortes').innerHTML = filtered.reverse().slice(0, 50).map(d => `
         <div class="item-corte">
           <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
           <div class="row g-0 text-muted small">
-            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0,25)}</div>
+            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0, 25)}</div>
             <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
           </div>
         </div>`).join('');
@@ -311,8 +356,8 @@
     }
 
     function gerarGrafico(obj) {
-      if(meuGrafico) meuGrafico.destroy();
-      const labels = Object.keys(obj).sort((a,b) => obj[b] - obj[a]).slice(0, 5);
+      if (meuGrafico) meuGrafico.destroy();
+      const labels = Object.keys(obj).sort((a, b) => obj[b] - obj[a]).slice(0, 5);
       meuGrafico = new Chart(document.getElementById('graficoCortes'), {
         type: 'bar',
         data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#4CAF50' }] },
@@ -320,51 +365,80 @@
       });
     }
 
+    // ===== PROMOÇÕES — CORRIGIDO =====
+    // O Apps Script retorna objetos com: { empresa, categoria, codigo, produto, preco, validade }
+    // A renderização agrupa por empresa (azul escuro) e depois por categoria (cinza escuro)
     function renderizarPromos(itens) {
       const container = document.getElementById('listaPromos');
       if (!container) return;
-      if (!itens || itens.length === 0) { 
-        container.innerHTML = "<div class='text-center p-3'>Buscando ofertas...</div>"; 
-        return; 
+      if (!itens || itens.length === 0) {
+        container.innerHTML = "<div class='text-center p-4 text-muted'>Buscando ofertas...</div>";
+        return;
       }
 
-      let htmlGeral = "";
-      const dataValidade = (itens[0].produto || "Consulte o Vendedor").toString();
-      htmlGeral = `<div class="alert alert-info text-center py-1 mb-3" style="font-size: 0.8rem; font-weight: bold; border-radius: 0; background-color: #e3f2fd;">VALIDADE: ${dataValidade}</div>`;
+      // Pega validade do primeiro item (campo retornado pelo Apps Script)
+      const validade = (itens[0].validade || '').toString().trim();
+      let html = validade
+        ? `<div class="alert alert-info text-center py-2 mb-3 fw-bold" style="font-size:0.82rem;">📅 VALIDADE: ${validade}</div>`
+        : '';
 
-      itens.forEach((item) => {
-        const prod = (item.produto || "").toString().trim();
-        const preco = (item.preco || "").toString().trim();
-        const cod = (item.codigo || "").toString().trim();
+      let empresaAtual = null;
+      let categoriaAtual = null;
 
-        if (!prod || prod === dataValidade) return;
+      itens.forEach(item => {
+        const empresa   = (item.empresa   || "").toString().trim();
+        const categoria = (item.categoria || "").toString().trim();
+        const produto   = (item.produto   || "").toString().trim();
+        const codigo    = (item.codigo    || "").toString().trim();
+        const preco     = (item.preco     || "").toString().trim();
 
-        if (cod === "" && (preco === "" || preco === "undefined")) {
-          htmlGeral += `<div class="bg-dark text-white fw-bold px-3 py-1 mt-3 mb-2 shadow-sm" style="font-size:0.75rem; border-radius:2px; letter-spacing:1px; text-transform: uppercase;">${prod}</div>`;
-        } 
-        else if (prod !== "DESCRIÇÃO DO PRODUTO" && cod !== "COD") {
-          htmlGeral += `
-            <div class="linha-produto mb-2 shadow-sm" style="border-left: 5px solid #dc3545; border-radius: 4px; background:white; display:flex; align-items:center; justify-content:space-between; padding:10px; border-bottom: 1px solid #eee;">
-              <div class="flex-grow-1" style="min-width:0">
-                <span class="d-block fw-bold text-truncate" style="font-size:0.88rem; color: #333;">${prod}</span>
-                <small class="text-muted" style="font-size:0.7rem; font-weight: 500;">COD: ${cod}</small>
-              </div>
-              <div class="ps-2">
-                <span class="badge bg-danger" style="padding:8px 12px; font-weight: bold; border-radius: 6px; font-size: 0.9rem;">
-                   ${preco.includes("R$") ? preco : "R$ " + preco}
-                </span>
-              </div>
-            </div>`;
+        if (!produto) return;
+
+        // Cabeçalho de EMPRESA (nível 1) — fundo azul escuro
+        if (empresa !== empresaAtual) {
+          empresaAtual = empresa;
+          categoriaAtual = null;
+          if (empresa) {
+            html += `<div class="promo-empresa-header">🏭 ${empresa}</div>`;
+          }
         }
+
+        // Cabeçalho de CATEGORIA (nível 2) — fundo cinza escuro
+        if (categoria !== categoriaAtual) {
+          categoriaAtual = categoria;
+          if (categoria) {
+            html += `<div class="promo-categoria-header">▸ ${categoria}</div>`;
+          }
+        }
+
+        // Card do produto
+        const precoFormatado = preco.includes("R$") ? preco : (preco ? "R$ " + preco : "—");
+        html += `
+          <div class="promo-item">
+            <div class="flex-grow-1" style="min-width:0">
+              <span class="d-block fw-bold text-truncate" style="font-size:0.88rem; color:#333;">${produto}</span>
+              <small class="text-muted" style="font-size:0.7rem; font-weight:500;">COD: ${codigo}</small>
+            </div>
+            <div class="ps-2">
+              <span class="badge bg-danger" style="padding:8px 12px; font-weight:bold; border-radius:6px; font-size:0.9rem;">${precoFormatado}</span>
+            </div>
+          </div>`;
       });
-      container.innerHTML = htmlGeral;
+
+      container.innerHTML = html;
     }
 
+    // Ao filtrar, mantém os campos empresa/categoria para o agrupamento continuar correto
     function filtrarPromos() {
       const t = document.getElementById('buscaPromo').value.toLowerCase();
-      renderizarPromos(dbPromos.filter(p => (p.produto || "").toLowerCase().includes(t) || (p.codigo || "").toString().includes(t)));
+      if (!t) { renderizarPromos(dbPromos); return; }
+      renderizarPromos(dbPromos.filter(p =>
+        (p.produto || "").toLowerCase().includes(t) ||
+        (p.codigo  || "").toString().includes(t)
+      ));
     }
 
+    // ===== PORTAL DO REPRESENTANTE =====
     async function carregarNomesRep() {
       try {
         const nomes = await callGoogleScript('vendedores');
@@ -375,13 +449,14 @@
     async function acessarLista() {
       const btn = document.getElementById('btnEntrar');
       btn.innerText = "Buscando..."; btn.disabled = true;
-      const rep = document.getElementById('selRep').value;
+      const rep  = document.getElementById('selRep').value;
       const pass = document.getElementById('passRep').value;
       try {
         const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
         btn.innerText = "ACESSAR RELATÓRIO"; btn.disabled = false;
-        if (res.erro) { document.getElementById('msgErro').innerText = res.erro; }
-        else {
+        if (res.erro) {
+          document.getElementById('msgErro').innerText = res.erro;
+        } else {
           document.getElementById('login-area').style.display = 'none';
           document.getElementById('pdf-area').style.display = 'block';
           document.getElementById('btnVer').href = res.previewUrl;
@@ -396,18 +471,20 @@
       document.getElementById('pdf-area').style.display = 'none';
     }
 
+    // ===== VIGILÂNCIA DE MUDANÇAS =====
     async function vigiarMudancas() {
       try {
-        const res = await callGoogleScript('estoque'); 
+        const res = await callGoogleScript('estoque');
         if (res && res.length > 0) {
           const dataPlanilha = res[0].dataAtualizacao;
           const dataNoApp = document.getElementById('data-estoque').innerText;
           if (dataNoApp !== "Sincronizando..." && dataPlanilha !== dataNoApp) {
-            if(!document.getElementById('alerta-update')) {
+            if (!document.getElementById('alerta-update')) {
               const alerta = document.createElement('div');
               alerta.id = "alerta-update";
               alerta.innerHTML = `<div style="background:#fff3cd; color:#856404; padding:15px; border-radius:12px; border:1px solid #ffeeba; position:fixed; top:80px; left:10px; right:10px; z-index:9999; box-shadow:0 4px 15px rgba(0,0,0,0.2);">
-                <div class="d-flex align-items-center"><i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i><div style="font-size:0.85rem"><strong>Dados Desatualizados!</strong><br>Planilha alterada em: <b>${dataPlanilha}</b>.</div></div>
+                <div class="d-flex align-items-center"><i class="bi bi-exclamation-triangle-fill fs-3 me-3"></i>
+                <div style="font-size:0.85rem"><strong>Dados Desatualizados!</strong><br>Planilha alterada em: <b>${dataPlanilha}</b>.</div></div>
                 <button onclick="this.closest('#alerta-update').remove(); atualizarTudo(document.querySelector('.icon-refresh').parentElement);" class="btn btn-warning btn-sm w-100 mt-2 fw-bold">ATUALIZAR AGORA</button>
               </div>`;
               document.body.appendChild(alerta);
