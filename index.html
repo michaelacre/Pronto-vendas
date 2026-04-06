@@ -369,65 +369,72 @@
     }
 
     function filtrarCortes() {
-      if (!vendedorLogadoCortes) return;
+  if (!vendedorLogadoCortes) return;
 
-      const fE  = document.getElementById('fEmp').value;
-      const fPa = document.getElementById('fParc').value.toLowerCase();
-      const fPr = document.getElementById('fProd').value.toLowerCase();
-      const dI  = document.getElementById('dIni').value;
-      const dF  = document.getElementById('dFim').value;
-      const fV  = isComercial ? document.getElementById('fVend').value : '';
+  const fE  = document.getElementById('fEmp').value;
+  const fPa = document.getElementById('fParc').value.toLowerCase();
+  const fPr = document.getElementById('fProd').value.toLowerCase();
+  const dI  = document.getElementById('dIni').value;
+  const dF  = document.getElementById('dFim').value;
 
-      const filtered = dbCortes.filter(d => {
-        const dataRow = d.data ? d.data.split('T')[0] : "";
+  // 🔥 NOVA LÓGICA MASTER
+  const isMaster = vendedorLogadoCortes.toUpperCase() === "COMERCIAL";
 
-        // Vendedor comum → só os próprios cortes
-        if (!isComercial && (d.vendedor || "").toUpperCase() !== vendedorLogadoCortes.toUpperCase()) return false;
+  const filtered = dbCortes.filter(d => {
+    const dataRow = d.data ? d.data.split('T')[0] : "";
 
-        // Comercial → respeita filtro de vendedor selecionado
-        if (isComercial && fV && (d.vendedor || "") !== fV) return false;
+    // 👇 aqui está o pulo do gato
+    const esteVendedor = isMaster 
+      ? true 
+      : (d.vendedor || "").toUpperCase() === vendedorLogadoCortes.toUpperCase();
 
-        let empresaMatch = true;
-        if (fE) {
-          const n = (d.empresa || "").toUpperCase();
-          if (fE === 'DPA') empresaMatch = n.includes("DOM") || n.includes("PORQUITO") || n.includes("DPA");
-          else empresaMatch = n.includes(fE.toUpperCase());
-        }
+    if (!esteVendedor) return false;
 
-        return empresaMatch &&
-          (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
-          (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
-          (!dI  || dataRow >= dI) &&
-          (!dF  || dataRow <= dF);
-      });
-
-      let totalCx = 0, totalRs = 0;
-      filtered.forEach(d => { totalCx += (Number(d.caixas) || 0); totalRs += (Number(d.valor) || 0); });
-      document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
-      document.getElementById('resValor').innerText  = totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-      document.getElementById('listaCortes').innerHTML = filtered.length === 0
-        ? '<div class="text-center text-muted py-4"><i class="bi bi-check-circle-fill text-success fs-2 d-block mb-2"></i>Nenhum corte encontrado!</div>'
-        : [...filtered].reverse().slice(0, 50).map(d => `
-            <div class="item-corte">
-              <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
-              <div class="row g-0 text-muted small">
-                <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0, 25)}</div>
-                <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
-              </div>
-              ${isComercial ? `<div class="text-muted small mt-1" style="font-size:0.7rem;"><i class="bi bi-person"></i> ${d.vendedor || ''}</div>` : ''}
-            </div>`).join('');
-
-      // Gráfico: comercial → por vendedor | vendedor → por cliente (top 5)
-      const agrupador = {};
-      filtered.forEach(d => {
-        const k = isComercial
-          ? (d.vendedor || "Sem vendedor").split(' ')[0]
-          : d.parceiro.toString().substring(0, 15);
-        agrupador[k] = (agrupador[k] || 0) + (Number(d.caixas) || 0);
-      });
-      gerarGrafico(agrupador);
+    let empresaMatch = true;
+    if (fE) {
+      const nomeNaPlanilha = (d.empresa || "").toUpperCase();
+      if (fE === 'DPA') {
+        empresaMatch = nomeNaPlanilha.includes("DOM") || nomeNaPlanilha.includes("PORQUITO") || nomeNaPlanilha.includes("DPA");
+      } else {
+        empresaMatch = nomeNaPlanilha.includes(fE.toUpperCase());
+      }
     }
+
+    return empresaMatch &&
+           (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
+           (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
+           (!dI || dataRow >= dI) && (!dF || dataRow <= dF);
+  });
+
+  let totalCx = 0, totalRs = 0;
+  filtered.forEach(d => {
+    totalCx += (Number(d.caixas) || 0);
+    totalRs += (Number(d.valor) || 0);
+  });
+
+  document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
+  document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
+
+  document.getElementById('listaCortes').innerHTML = filtered.length === 0
+    ? '<div class="text-center text-muted py-4"><i class="bi bi-check-circle-fill text-success fs-2 d-block mb-2"></i>Nenhum corte encontrado!</div>'
+    : filtered.reverse().slice(0, 50).map(d => `
+        <div class="item-corte">
+          <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
+          <div class="row g-0 text-muted small">
+            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0, 25)}</div>
+            <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
+          </div>
+        </div>`).join('');
+
+  // 🔥 gráfico (continua funcionando normal)
+  const clienteCont = {};
+  filtered.forEach(d => {
+    const cli = d.parceiro.toString().substring(0, 15);
+    clienteCont[cli] = (clienteCont[cli] || 0) + (Number(d.caixas) || 0);
+  });
+
+  gerarGrafico(clienteCont);
+}
 
     function gerarGrafico(obj) {
       if (meuGrafico) meuGrafico.destroy();
