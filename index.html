@@ -84,35 +84,39 @@
     }
 
     /* ===== LOGIN CORTES ===== */
-    .cortes-login-wrap {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
-      min-height: 70vh;
-      padding: 0 8px;
-    }
-    .cortes-login-card {
-      background: white;
+    #cortes-login-area {
+      background: #fff;
       border-radius: 16px;
-      box-shadow: 0 4px 20px rgba(0,0,0,0.10);
-      padding: 32px 24px 24px;
-      width: 100%;
-      max-width: 380px;
+      padding: 32px 20px;
+      margin: 16px 8px;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.1);
       text-align: center;
     }
-    .badge-vendedor-logado {
+    #cortes-login-area .login-icon {
+      font-size: 3.5rem;
+      color: var(--jarvis-blue);
+      margin-bottom: 8px;
+    }
+    #cortes-login-area h6 {
+      color: var(--jarvis-blue);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      margin-bottom: 20px;
+      font-size: 0.85rem;
+    }
+    /* Badge de sessão do usuário logado nos cortes */
+    #cortes-user-badge {
+      display: none;
       background: var(--jarvis-blue);
       color: white;
       border-radius: 20px;
-      padding: 5px 16px;
-      font-size: 0.78rem;
+      padding: 4px 14px;
+      font-size: 0.72rem;
       font-weight: bold;
-      display: inline-flex;
       align-items: center;
       gap: 6px;
-      margin-bottom: 10px;
     }
+    #cortes-user-badge.visible { display: inline-flex; }
 
     @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
     .bi-spin { display: inline-block; animation: spin 1.5s linear infinite; }
@@ -135,7 +139,7 @@
       <div class="d-flex gap-1 overflow-auto pb-1">
         <button class="btn btn-sm btn-dark" onclick="filtrarEmpresa('TODOS')">TODOS</button>
         <button class="btn btn-sm btn-primary" onclick="filtrarEmpresa('ACREAVES')">ACREAVES</button>
-        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORQUITO')">D.PORQUITO</button>
+        <button class="btn btn-sm btn-success" onclick="filtrarEmpresa('DOM PORUQUITO')">D.PORQUITO</button>
         <button class="btn btn-sm btn-warning text-dark" onclick="filtrarEmpresa('FRIPAL')">FRIPAL</button>
       </div>
     </div>
@@ -144,43 +148,42 @@
 
   <!-- ===== CORTES ===== -->
   <div id="cortes-section" class="section-app">
-    <div class="header-app mb-3"><h6>INTELIGÊNCIA DE CORTES</h6></div>
-
-    <!-- LOGIN CORTES -->
-    <div id="cortes-login-area" class="cortes-login-wrap">
-      <div class="cortes-login-card">
-        <i class="bi bi-scissors text-danger" style="font-size: 3rem;"></i>
-        <h5 class="fw-bold mt-2 mb-1" style="color: var(--jarvis-blue);">Acesso Restrito</h5>
-        <p class="text-muted small mb-4">Faça login para ver seus cortes</p>
-        <div class="mb-3 text-start">
-          <label class="label-mini">REPRESENTANTE</label>
-          <select id="selRepCortes" class="form-select form-select-lg"></select>
-        </div>
-        <div class="mb-4 text-start">
-          <label class="label-mini">SENHA DE ACESSO</label>
-          <input type="password" id="passCortes" class="form-control form-control-lg" placeholder="****"
-            onkeydown="if(event.key==='Enter') acessarCortes()">
-        </div>
-        <button id="btnEntrarCortes" class="btn btn-danger btn-lg w-100 fw-bold" onclick="acessarCortes()">
-          <i class="bi bi-scissors me-2"></i>VER MEUS CORTES
+    <div class="header-app d-flex justify-content-between align-items-center px-3 mb-3">
+      <div style="width: 32px;"></div>
+      <h6 class="mb-0">INTELIGÊNCIA DE CORTES</h6>
+      <!-- Badge com nome do usuário logado + botão de sair -->
+      <div id="cortes-user-badge">
+        <i class="bi bi-person-fill"></i>
+        <span id="cortes-user-nome">-</span>
+        <button onclick="sairCortes()" class="btn btn-sm p-0 ms-1" style="color:rgba(255,255,255,0.7); font-size:0.65rem; line-height:1;">
+          <i class="bi bi-box-arrow-right"></i>
         </button>
-        <div id="msgErroCortes" class="text-danger small mt-3 fw-bold"></div>
       </div>
+      <div style="width:32px" id="cortes-spacer"></div>
     </div>
 
-    <!-- PAINEL DE CORTES (após login) -->
-    <div id="cortes-painel" style="display:none;">
-      <!-- Badge do vendedor logado -->
-      <div class="px-2 mb-2 d-flex justify-content-between align-items-center">
-        <div class="badge-vendedor-logado">
-          <i class="bi bi-person-check-fill"></i>
-          <span id="nomeVendedorLogado"></span>
-        </div>
-        <button class="btn btn-sm btn-outline-secondary" onclick="sairCortes()">
-          <i class="bi bi-box-arrow-left me-1"></i>Sair
-        </button>
-      </div>
+    <!-- ÁREA DE LOGIN DOS CORTES -->
+    <div id="cortes-login-area">
+      <div class="login-icon"><i class="bi bi-scissors"></i></div>
+      <h6>ACESSO AOS CORTES</h6>
 
+      <div class="mb-3 text-start">
+        <label class="label-mini">REPRESENTANTE</label>
+        <select id="selRepCortes" class="form-select form-select-lg"></select>
+      </div>
+      <div class="mb-4 text-start">
+        <label class="label-mini">SENHA DE ACESSO</label>
+        <input type="password" id="passCortes" class="form-control form-control-lg" placeholder="****"
+               onkeydown="if(event.key==='Enter') acessarCortes()">
+      </div>
+      <button id="btnEntrarCortes" class="btn btn-primary btn-lg w-100" onclick="acessarCortes()">
+        <i class="bi bi-unlock-fill me-2"></i>ACESSAR CORTES
+      </button>
+      <div id="msgErroCortes" class="text-danger small mt-3 fw-bold"></div>
+    </div>
+
+    <!-- ÁREA DE CONTEÚDO DOS CORTES (oculta até login) -->
+    <div id="cortes-conteudo" style="display:none;">
       <div class="row g-2 mb-3 px-2">
         <div class="col-6"><div class="card-kpi"><h3>Cx Cortadas</h3><p id="resCaixas">0</p></div></div>
         <div class="col-6"><div class="card-kpi"><h3>Prejuízo</h3><p id="resValor">R$ 0</p></div></div>
@@ -199,7 +202,12 @@
               <option value="FRIPAL">FRIPAL</option>
             </select>
           </div>
-          <div class="col-12"><span class="label-mini">CLIENTE</span><input type="text" id="fParc" class="form-control form-control-sm" placeholder="Cliente..." oninput="filtrarCortes()"></div>
+          <!-- Filtro de vendedor: aparece APENAS para o COMERCIAL -->
+          <div class="col-6" id="filtroVendedorWrap">
+            <span class="label-mini">VENDEDOR</span>
+            <select id="fVend" class="form-select form-select-sm" onchange="filtrarCortes()"><option value="">Todos</option></select>
+          </div>
+          <div class="col-6"><span class="label-mini">CLIENTE</span><input type="text" id="fParc" class="form-control form-control-sm" placeholder="Cliente..." oninput="filtrarCortes()"></div>
         </div>
         <div class="mt-2" style="height: 150px;"><canvas id="graficoCortes"></canvas></div>
       </div>
@@ -257,7 +265,14 @@
 
   <script>
     let dbEstoque = []; let dbCortes = []; let dbPromos = []; let meuGrafico = null;
-    let vendedorLogadoCortes = null; // vendedor autenticado na tela de cortes
+
+    // ===== ESTADO DE SESSÃO DOS CORTES =====
+    // Guarda o usuário logado na seção de cortes e se é o comercial
+    let cortesSession = {
+      logado: false,
+      nomeVendedor: '',
+      isComercial: false
+    };
 
     const SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwZvfaA3oww40jnKzJ5DlOdk7aVllDGfmrD6qdEpHJqvNh87ddll2JQtn7adkiCC4wP/exec';
     const API_CORTES = 'https://script.google.com/macros/s/AKfycbxls0_YggrbwieuD1yahH78PiiJLpT2ikySnvrrH_DGK5mGknpmJ5XQBuShygMfXrwKGQ/exec';
@@ -279,8 +294,9 @@
         renderizarEstoque(dbEstoque);
       } catch (e) { console.error("Erro inicial", e); }
 
-      carregarCortes();
+      // Carrega nomes para os dois selects de login (Cortes + Não Posit)
       carregarNomesRep();
+
       window.addEventListener('focus', vigiarMudancas);
       setInterval(vigiarMudancas, 300000);
     };
@@ -368,55 +384,77 @@
       }
     }
 
-    // ===== LOGIN CORTES =====
+    // ===================================================
+    // ===== LOGIN DOS CORTES =============================
+    // ===================================================
+
+    // Autentica usando a mesma rota 'pdf' do Apps Script (mesma tabela Vendedor)
+    // Após autenticação, verifica se é COMERCIAL para liberar visão geral
     async function acessarCortes() {
       const btn = document.getElementById('btnEntrarCortes');
-      const rep  = document.getElementById('selRepCortes').value;
-      const pass = document.getElementById('passCortes').value;
       const msgErro = document.getElementById('msgErroCortes');
+      const vendedor = document.getElementById('selRepCortes').value;
+      const senha = document.getElementById('passCortes').value;
 
-      if (!pass) { msgErro.innerText = "Digite a senha."; return; }
-
+      if (!senha) { msgErro.innerText = "Digite sua senha."; return; }
+      msgErro.innerText = "";
       btn.innerHTML = '<i class="bi bi-hourglass-split me-2"></i>Verificando...';
       btn.disabled = true;
-      msgErro.innerText = "";
 
       try {
-        // Reutiliza a mesma rota de autenticação do portal do representante
-        const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(rep)}&senha=${encodeURIComponent(pass)}`);
+        // Reutiliza a mesma autenticação do portal (rota 'pdf')
+        const res = await callGoogleScript('pdf', `&vendedor=${encodeURIComponent(vendedor)}&senha=${encodeURIComponent(senha)}`);
 
-        btn.innerHTML = '<i class="bi bi-scissors me-2"></i>VER MEUS CORTES';
+        btn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i>ACESSAR CORTES';
         btn.disabled = false;
 
-        if (res.erro) {
-          msgErro.innerText = res.erro;
+        // O Apps Script retorna { erro: "Senha incorreta." } se falhar
+        if (res.erro && res.erro.toLowerCase().includes('senha')) {
+          msgErro.innerText = "❌ Senha incorreta. Tente novamente.";
+          return;
+        }
+
+        // ---- LOGIN BEM-SUCEDIDO ----
+        const isComercial = vendedor.toUpperCase() === 'COMERCIAL';
+
+        cortesSession = { logado: true, nomeVendedor: vendedor, isComercial };
+
+        // Esconde login, mostra conteúdo
+        document.getElementById('cortes-login-area').style.display = 'none';
+        document.getElementById('cortes-conteudo').style.display = 'block';
+
+        // Atualiza badge no header
+        document.getElementById('cortes-user-nome').innerText = vendedor.split(' ')[0];
+        document.getElementById('cortes-user-badge').classList.add('visible');
+        document.getElementById('cortes-spacer').style.display = 'none';
+
+        // Filtro de vendedor: só COMERCIAL vê
+        document.getElementById('filtroVendedorWrap').style.display = isComercial ? '' : 'none';
+
+        // Carrega cortes (se ainda não carregou)
+        if (dbCortes.length === 0) {
+          await carregarCortes();
         } else {
-          // Autenticado com sucesso — mostra painel de cortes
-          vendedorLogadoCortes = rep;
-          document.getElementById('cortes-login-area').style.display = 'none';
-          document.getElementById('cortes-painel').style.display = 'block';
-          document.getElementById('nomeVendedorLogado').innerText = rep;
-          document.getElementById('passCortes').value = '';
           filtrarCortes();
         }
+
       } catch (e) {
-        btn.innerHTML = '<i class="bi bi-scissors me-2"></i>VER MEUS CORTES';
+        btn.innerHTML = '<i class="bi bi-unlock-fill me-2"></i>ACESSAR CORTES';
         btn.disabled = false;
         msgErro.innerText = "Erro de conexão. Tente novamente.";
       }
     }
 
+    // Botão "sair" dos cortes — volta para o login
     function sairCortes() {
-      vendedorLogadoCortes = null;
-      document.getElementById('cortes-login-area').style.display = 'flex';
-      document.getElementById('cortes-painel').style.display = 'none';
+      cortesSession = { logado: false, nomeVendedor: '', isComercial: false };
+      document.getElementById('passCortes').value = '';
       document.getElementById('msgErroCortes').innerText = '';
-      // Limpa os filtros
-      document.getElementById('dIni').value = '';
-      document.getElementById('dFim').value = '';
-      document.getElementById('fProd').value = '';
-      document.getElementById('fEmp').value = '';
-      document.getElementById('fParc').value = '';
+      document.getElementById('cortes-login-area').style.display = 'block';
+      document.getElementById('cortes-conteudo').style.display = 'none';
+      document.getElementById('cortes-user-badge').classList.remove('visible');
+      document.getElementById('cortes-spacer').style.display = '';
+      if (meuGrafico) { meuGrafico.destroy(); meuGrafico = null; }
     }
 
     // ===== CORTES =====
@@ -424,11 +462,21 @@
       try {
         const res = await fetch(API_CORTES);
         dbCortes = await res.json();
+
+        // Popula select de vendedores (usado pelo COMERCIAL)
+        const vends = [...new Set(dbCortes.map(d => d.vendedor))].sort();
+        document.getElementById('fVend').innerHTML =
+          '<option value="">Todos</option>' +
+          vends.map(v => `<option value="${v}">${v}</option>`).join('');
+
+        filtrarCortes();
       } catch (e) { console.log("Erro carregar cortes"); }
     }
 
     function filtrarCortes() {
-      if (!vendedorLogadoCortes) return;
+      const fV = cortesSession.isComercial
+        ? document.getElementById('fVend').value   // COMERCIAL: usa o select
+        : cortesSession.nomeVendedor;               // Vendedor: força o próprio nome
 
       const fE  = document.getElementById('fEmp').value;
       const fPa = document.getElementById('fParc').value.toLowerCase();
@@ -436,14 +484,10 @@
       const dI  = document.getElementById('dIni').value;
       const dF  = document.getElementById('dFim').value;
 
-      // Filtra SEMPRE pelo vendedor logado
       const filtered = dbCortes.filter(d => {
         const dataRow = d.data ? d.data.split('T')[0] : "";
 
-        // Verifica se é o vendedor logado (case-insensitive)
-        const esteVendedor = (d.vendedor || "").toUpperCase() === vendedorLogadoCortes.toUpperCase();
-        if (!esteVendedor) return false;
-
+        // Filtro de empresa
         let empresaMatch = true;
         if (fE) {
           const nomeNaPlanilha = (d.empresa || "").toUpperCase();
@@ -454,53 +498,55 @@
           }
         }
 
-        return empresaMatch &&
+        // Filtro de vendedor:
+        //   COMERCIAL sem filtro selecionado → vê tudo
+        //   COMERCIAL com filtro → filtra pelo select
+        //   Vendedor comum → sempre filtra pelo próprio nome
+        let vendMatch = true;
+        if (fV) {
+          vendMatch = (d.vendedor || "").toString().toUpperCase() === fV.toUpperCase();
+        }
+
+        return vendMatch && empresaMatch &&
                (!fPa || d.parceiro.toString().toLowerCase().includes(fPa)) &&
                (!fPr || d.produto.toString().toLowerCase().includes(fPr)) &&
-               (!dI || dataRow >= dI) && (!dF || dataRow <= dF);
+               (!dI  || dataRow >= dI) && (!dF || dataRow <= dF);
       });
 
-      let totalCx = 0, totalRs = 0;
+      let totalCx = 0, totalRs = 0, vendCont = {};
       filtered.forEach(d => {
-        totalCx += (Number(d.caixas) || 0);
+        const cax = Number(d.caixas) || 0;
+        totalCx += cax;
         totalRs += (Number(d.valor) || 0);
+        vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + cax;
       });
 
       document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
       document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
-
-      document.getElementById('listaCortes').innerHTML = filtered.length === 0
-        ? '<div class="text-center text-muted py-4"><i class="bi bi-check-circle-fill text-success fs-2 d-block mb-2"></i>Nenhum corte encontrado!</div>'
-        : filtered.reverse().slice(0, 50).map(d => `
-            <div class="item-corte">
-              <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
-              <div class="row g-0 text-muted small">
-                <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0, 25)}</div>
-                <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
-              </div>
-            </div>`).join('');
-
-      // Gráfico por cliente (top 5) do vendedor logado
-      const clienteCont = {};
-      filtered.forEach(d => {
-        const cli = d.parceiro.toString().substring(0, 15);
-        clienteCont[cli] = (clienteCont[cli] || 0) + (Number(d.caixas) || 0);
-      });
-      gerarGrafico(clienteCont);
+      document.getElementById('listaCortes').innerHTML = filtered.reverse().slice(0, 50).map(d => `
+        <div class="item-corte">
+          <div class="top"><span>${d.produto}</span><span class="text-danger">-${d.caixas} Cx</span></div>
+          <div class="row g-0 text-muted small">
+            <div class="col-7"><i class="bi bi-shop"></i> ${d.parceiro.toString().substring(0, 25)}</div>
+            <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
+          </div>
+        </div>`).join('');
+      gerarGrafico(vendCont);
     }
 
     function gerarGrafico(obj) {
       if (meuGrafico) meuGrafico.destroy();
       const labels = Object.keys(obj).sort((a, b) => obj[b] - obj[a]).slice(0, 5);
-      if (labels.length === 0) return;
       meuGrafico = new Chart(document.getElementById('graficoCortes'), {
         type: 'bar',
-        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#dc3545' }] },
+        data: { labels: labels.map(l => l.split(' ')[0]), datasets: [{ data: labels.map(l => obj[l]), backgroundColor: '#4CAF50' }] },
         options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { display: false }, x: { grid: { display: false } } } }
       });
     }
 
-    // ===== PROMOÇÕES =====
+    // ===================================================
+    // ===== PROMOÇÕES ===================================
+    // ===================================================
     function renderizarPromos(itens) {
       const container = document.getElementById('listaPromos');
       if (!container) return;
@@ -562,14 +608,18 @@
       ));
     }
 
-    // ===== PORTAL DO REPRESENTANTE =====
+    // ===================================================
+    // ===== PORTAL DO REPRESENTANTE =====================
+    // ===================================================
     async function carregarNomesRep() {
       try {
         const nomes = await callGoogleScript('vendedores');
-        // Popula ambos os selects (portal + cortes)
-        const options = nomes.map(n => `<option value="${n}">${n}</option>`).join('');
-        document.getElementById('selRep').innerHTML = options;
-        document.getElementById('selRepCortes').innerHTML = options;
+        // Popula o select do Portal (Não Posit.)
+        document.getElementById('selRep').innerHTML =
+          nomes.map(n => `<option value="${n}">${n}</option>`).join('');
+        // Popula o select do login dos Cortes com os mesmos nomes
+        document.getElementById('selRepCortes').innerHTML =
+          nomes.map(n => `<option value="${n}">${n}</option>`).join('');
       } catch (e) {}
     }
 
