@@ -513,13 +513,15 @@
                (!dI  || dataRow >= dI) && (!dF || dataRow <= dF);
       });
 
-      let totalCx = 0, totalRs = 0, vendCont = {};
-      filtered.forEach(d => {
-        const cax = Number(d.caixas) || 0;
-        totalCx += cax;
-        totalRs += (Number(d.valor) || 0);
-        vendCont[d.vendedor] = (vendCont[d.vendedor] || 0) + cax;
-      });
+    let totalCx = 0, totalRs = 0, clienteCont = {};
+filtered.forEach(d => {
+  const cax = Number(d.caixas) || 0;
+  totalCx += cax;
+  totalRs += (Number(d.valor) || 0);
+
+  const cli = d.parceiro.toString().substring(0, 15);
+  clienteCont[cli] = (clienteCont[cli] || 0) + cax;
+});
 
       document.getElementById('resCaixas').innerText = totalCx.toFixed(1);
       document.getElementById('resValor').innerText = totalRs.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' });
@@ -531,7 +533,7 @@
             <div class="col-5 text-end"><i class="bi bi-calendar-event"></i> ${new Date(d.data).toLocaleDateString('pt-BR')}</div>
           </div>
         </div>`).join('');
-      gerarGrafico(vendCont);
+      gerarGrafico(clienteCont);
     }
 
     function gerarGrafico(obj) {
